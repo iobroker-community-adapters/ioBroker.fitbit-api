@@ -1,0 +1,106 @@
+{
+    "common": {
+        "name": "fitbit-api",
+        "version": "0.1.0",
+        "news": {
+            "0.1.0": {
+                "en": "Initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "изначальный выпуск",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "初始发行"
+            }
+        },
+		"title": "fitbit API",
+        "desc": {
+            "en": "This adapter pull Data from fitbit API",
+            "de": "Dieser Adapter zieht Daten aus der Fitbit-API",
+            "ru": "Этот адаптер извлекает данные из fitbit API",
+            "pt": "Este adaptador extrai dados da API fitbit",
+            "nl": "Deze adapter haalt gegevens uit de fitbit API",
+            "fr": "Cet adaptateur extrait les données de l'API fitbit",
+            "it": "Questo adattatore estrae i dati dall'API fitbit",
+            "es": "Este adaptador extrae datos de la API de Fitbit",
+            "pl": "Ten adapter pobiera dane z fitbit API",
+            "zh-cn": "该适配器从fitbit API中提取数据"
+        },
+        "authors": [
+            "bluefox <dogafox@gmail.com>"
+        ],
+        "platform": "Javascript/Node.js",
+        "mode": "schedule",
+        "schedule": "*/15 * * * *",
+        "icon": "fitbit-api.png",
+        "materialize": true,
+        "compact": true,
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.fitbit-api/master/admin/fitbit-api.png",
+        "keywords": ["fitbit", "scale", "weight"],
+        "readme": "https://github.com/iobroker-community-adapters/ioBroker.fitbit-api/blob/master/README.md",
+        "loglevel": "info",
+        "type": "health",
+        "license": "MIT",
+        "messagebox": false
+    },
+    "native": {
+        "clientID": "",
+        "clientSecret": "",
+        "userID": "",
+        "token": "",
+        "weight": false,
+        "fat": false,
+        "activities": false,
+        "devices": true
+    },
+    "instanceObjects": [
+        {
+            "_id":  "tokens",
+            "type": "channel",
+            "common": {
+                "name": "Access tokens"
+            },
+            "native": {}
+        },
+        {
+            "_id":  "tokens.access",
+            "type": "state",
+            "common": {
+                "role":  "state",
+                "name":  "Access token",
+                "type":  "string",
+                "read":  true,
+                "write": false
+            },
+            "native": {}
+        },
+        {
+            "_id":  "tokens.refresh",
+            "type": "state",
+            "common": {
+                "role":  "state",
+                "name":  "Refresh token",
+                "type":  "string",
+                "read":  true,
+                "write": false
+            },
+            "native": {}
+        },
+        {
+            "_id":  "tokens.expire",
+            "type": "state",
+            "common": {
+                "role":  "state",
+                "name":  "Expire on",
+                "type":  "string",
+                "read":  true,
+                "write": false
+            },
+            "native": {}
+        }
+    ]
+}

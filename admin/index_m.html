@@ -1,0 +1,195 @@
+<html>
+<head>
+<!-- these 4 files always have to be included -->
+<link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
+<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+
+<script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+
+<!-- these files always have to be included -->
+<script type="text/javascript" src="../../js/translate.js"></script>
+<script type="text/javascript" src="../../lib/js/materialize.js"></script>
+<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+<script type="text/javascript" src="words.js"></script>
+
+<script type="text/javascript">
+    function load(settings, onChange) {
+        if (!settings) {
+           return;
+        }
+
+        $('.value').each(function () {
+            var $key = $(this);
+            var id = $key.attr('id');
+
+            if ($key.attr('type') === 'checkbox') {
+		        // do not call onChange direct, because onChange could expect some arguments
+                $key.prop('checked', settings[id]).on('change', function() {
+                    onChange();
+                });
+            } else {
+		        // do not call onChange direct, because onChange could expect some arguments
+                $key.val(settings[id]).on('change', function() {
+                    onChange();
+                }).on('keyup', function() {
+                    onChange();
+                });
+            }
+        });
+
+        $('.generate_selector').on('change', function () {
+            var id = $(this).attr('id');
+            if (id === 'yes_generate') {
+                $('#no_generate').prop('checked', false);
+            } else {
+                $('#yes_generate').prop('checked', false);
+            }
+        });
+
+        $('.table-button-do').on('click', function () {
+            var clientID = $('#clientID').val();
+            var url = 'https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=' + clientID + '&redirect_uri=https%3A%2F%2Foauth.iobroker.in%2Ftoken&scope=activity%20heartrate%20location%20nutrition%20profile%20sleep%20social%20weight&expires_in=2592000000';
+            var $iframe = $('#iframe');
+            $('#iframe_div').show();
+            $('.tokens').hide();
+            $iframe.attr('src', url).show();
+            $iframe.css('border', '1px solid red');
+        });
+
+        var eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent';
+        var eventer = window[eventMethod];
+        var messageEvent = eventMethod === 'attachEvent' ? 'onmessage' : 'message';
+        eventer(messageEvent, function (e) {
+            console.log(e.data);
+            $('#iframe').css('border', '0').hide();
+            $('#iframe_div').hide();
+            $('.tokens').show();
+
+            if (e.data) {
+                var clientID = $('#clientID').val();
+                var clientSecret = $('#clientSecret').val();
+
+                $.ajax({
+                    url: 'https://api.fitbit.com/oauth2/token',
+                    type: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': 'Basic ' + btoa(clientID + ':' + clientSecret),
+                    },
+                    data: 'clientId=' + clientID + '&grant_type=authorization_code&redirect_uri=https%3A%2F%2Foauth.iobroker.in%2Ftoken&code=' + e.data,
+                }).done(function (data) {
+                    var time = new Date();
+                    time.setSeconds(time.getSeconds() + data.expires_in);
+
+                    socket.emit('setState', 'fitbit-api.' + instance + '.tokens.access', data.access_token, true);
+                    socket.emit('setState', 'fitbit-api.' + instance + '.tokens.refresh', data.refresh_token, true);
+                    socket.emit('setState', 'fitbit-api.' + instance + '.tokens.expire', time.toISOString(), true);
+                    $('#accessToken').val(data.access_token);
+                    $('#refreshToken').val(data.refresh_token);
+                    $('#expireOn').val(time.toISOString());
+                    M.updateTextFields();
+                }).fail(function (err) {
+                    window.alert(err);
+                });
+            }
+        }, false);
+
+        socket.emit('getState', 'fitbit-api.' + instance + '.tokens.access', function (err, state) {
+            $('#accessToken').val(state ? state.val || '' : '');
+        });
+        socket.emit('getState', 'fitbit-api.' + instance + '.tokens.refresh', function (err, state) {
+            $('#refreshToken').val(state ? state.val || '' : '');
+        });
+        socket.emit('getState', 'fitbit-api.' + instance + '.tokens.expire', function (err, state) {
+            $('#expireOn').val(state ? state.val || '' : '');
+            setTimeout(function () {M.updateTextFields()}, 500);
+        });
+        if (!settings.clientID || !settings.clientSecret) {
+            $('.table-button-do').addClass('disabled');
+        }
+        $('#clientID').on('change', function () {
+            if (!$('#clientID').val() || !$('#clientSecret').val()) {
+                $('.table-button-do').addClass('disabled');
+            } else {
+                $('.table-button-do').removeClass('disabled');
+            }
+        })
+            .on('keyup', function () {$(this).trigger('change')});
+
+        $('#clientSecret').on('change', function () {
+            if (!$('#clientID').val() || !$('#clientSecret').val()) {
+                $('.table-button-do').addClass('disabled');
+            } else {
+                $('.table-button-do').removeClass('disabled');
+            }
+        })
+            .on('keyup', function () {$(this).trigger('change')});
+
+
+        onChange(false);
+        M.updateTextFields();
+    }
+
+    function save(callback) {
+        var obj = {};
+        $('.value').each(function () {
+            var $this = $(this);
+            if ($this.attr('type') === 'checkbox') {
+                obj[$this.attr('id')] = $this.prop('checked');
+            } else {
+                obj[$this.attr('id')] = $this.val();
+            }
+        });
+        obj.generate = $('#yes_generate ').prop('checked');
+
+        callback(obj);
+    }
+</script>
+</head>
+<body>
+<div class="m adapter-container">
+    <div class="row">
+        <div class="col s6">
+            <img src="fitbit-api.png" alt="logo" class="logo">
+        </div>
+    </div>
+    <div class="row">
+        <div class="input-field col s12 m6 l4">
+            <input class="value" id="clientID" type="text">
+            <label for="clientID">OAuth Client ID</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="input-field col s12 m6 l4">
+            <input class="value" id="clientSecret" type="text">
+            <label for="clientSecret">Client secret</label>
+        </div>
+    </div>
+    <div class="row">
+        <a class="waves-effect waves-light btn blue table-button-do"><i class="material-icons">add</i><span class="translate">Authorize</span></a>
+    </div>
+    <div class="row" id="iframe_div">
+        <iframe id="iframe" name="iframe" src="" style="display: none; width: 100%; height: calc(100% - 295px); border: 0;"></iframe>
+    </div>
+    <div class="row tokens">
+        <div class="input-field col s12">
+            <input id="accessToken" type="text" readonly>
+            <label for="accessToken">Access token</label>
+        </div>
+    </div>
+    <div class="row tokens">
+        <div class="input-field col s12">
+            <input id="refreshToken" type="text" readonly>
+            <label for="refreshToken">Refresh token</label>
+        </div>
+    </div>
+    <div class="row tokens">
+        <div class="input-field col s12 m6 l4">
+            <input id="expireOn" type="text" readonly>
+            <label for="expireOn">Expires on</label>
+        </div>
+    </div>
+</div>
+</body>
+</html>

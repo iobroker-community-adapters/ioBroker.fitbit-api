@@ -85,7 +85,8 @@ function requestProfile(token, adapter) {
                     reject('User not found');
                 }
             } else {
-                reject(error || response.statusCode);
+                adapter.log.error('Cannot read profile: ' + (body || error || response.statusCode));
+                reject('Cannot read profile: ' + (body || error || response.statusCode));
             }
         });
     });
@@ -162,7 +163,7 @@ function requestWeight(token, adapter) {
                         const data = JSON.parse(body);
                         adapter.log.debug('weight: ' + JSON.stringify(data));
 
-                        if (data && data.weight) {
+                        if (data && data.weight && data.weight.length) {
                             const value = data.weight.shift();
                             const date = new Date(`${value.date}T${value.time}`);
 
@@ -182,7 +183,8 @@ function requestWeight(token, adapter) {
                             reject('Weight is not found');
                         }
                     } else {
-                        reject(error || response.statusCode);
+                        adapter.log.error('Cannot read weight: ' + (body || error || response.statusCode));
+                        reject('Cannot read weight: ' + (body || error || response.statusCode));
                     }
                 }));
     });
@@ -248,7 +250,8 @@ function requestBodyFat(token, adapter) {
                     reject('fat is not found');
                 }
             } else {
-                reject(error || response.statusCode);
+                adapter.log.error('Cannot read fat: ' + (body || error || response.statusCode));
+                reject('Cannot read fat: ' + (body || error || response.statusCode));
             }
         });
     });
@@ -369,7 +372,8 @@ function requestActivities(token, adapter) {
                     reject('Activities not found');
                 }
             } else {
-                reject(error || response.statusCode);
+                adapter.log.error('Cannot read activities: ' + (body || error || response.statusCode));
+                reject('Cannot read activities: ' + (body || error || response.statusCode));
             }
         });
     });
@@ -450,7 +454,8 @@ function requestDevices(token, adapter) {
                     .then(() => resolve())
                     .catch(e => reject(e));
             } else {
-                reject(error || response.statusCode);
+                adapter.log.error('Cannot read devices: ' + (body || error || response.statusCode));
+                reject('Cannot read devices: ' + (body || error || response.statusCode));
             }
         });
     });
@@ -521,7 +526,7 @@ function main(adapter) {
             !promises.length && adapter.log.error('No one option is enabled. Please enable what kind of data do you want to have in adapter configuration!');
 
             Promise.all(promises)
-                .catch(e => adapter.log.error(e))
+                .catch(e => adapter.log.error('Cannot read: ' + e))
                 .then(() => setTimeout(() => adapter.stop(), 1000));
         }).catch(e => {
             adapter.log.error(e);

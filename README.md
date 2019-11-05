@@ -1,16 +1,49 @@
-![Logo](admin/fitbit.png)
+![Logo](admin/fitbit-api.png)
 # ioBroker.fitbit
 
-This adapter pull Data from fitbit API!
+This adapter pulls Data from fitbit API!
 
 ## Configuration
-- Register your APP on https://dev.fitbit.com/apps
-- Insert clientID and client secret into configuration.
+![step1](img/step1.png)
+
+Register your APP on https://dev.fitbit.com/apps
+
+![step2](img/step2.png)
+
+`Callback URL` **is important!**: `https://oauth.iobroker.in/token`
+You can use following settings:
+- `Application Website`: `https://www.iobroker.net`
+- `Organization`: `ioBroker Community`
+- `Organization Website`: `https://www.iobroker.com`
+- `Terms Of Service Url`: `https://iobroker.pro/policy_en`
+- `Privacy Policy Url`: `https://iobroker.pro/policy_en`
+- `OAuth 2.0 Application Type`: `client`
+- **Callback URL***: `https://oauth.iobroker.in/token`
+
+And press `Save` at the bottom of the input form.
+
+![step3](img/step3.png)
+
+Copy the `Client ID` and `Client secret`.
+
+![step4](img/step4.png)
+
+Insert `clientID` and `client secret` into adapter configuration.
+
+Press "Authorize" button.
+
+![step5](img/step5.png)
+
+After that you could be asked to enter your credentials again or if the browser cache is still consist the cookies, it could be done automatically.
+
+Then `access token` and `refresh token` will appear. They are read-only.
+
+Don't forget to save the configuration settings, else the refresh of the token will not work.
+
+If the process does not work for you, you can try to get the access token manually: https://dev.fitbit.com/apps/oauthinteractivetutorial
 
 ## Development
 The API was implemented according to https://dev.fitbit.com/build/reference/web-api/basics/
-
-`METRIC` units are used.
 
 ## Changelog
 

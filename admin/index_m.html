@@ -49,9 +49,10 @@
 
         $('.table-button-do').on('click', function () {
             var clientID = $('#clientID').val();
-            var url = 'https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=' + clientID + '&redirect_uri=https%3A%2F%2Foauth.iobroker.in%2Ftoken&scope=activity%20heartrate%20location%20nutrition%20profile%20sleep%20social%20weight&expires_in=2592000000';
+            var url = 'https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=' + clientID + '&redirect_uri=https%3A%2F%2Foauth.iobroker.in%2Ftoken&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=2592000000';
             var $iframe = $('#iframe');
             $('#iframe_div').show();
+            $('.no-iframe').hide();
             $('.tokens').hide();
             $iframe.attr('src', url).show();
             $iframe.css('border', '1px solid red');
@@ -65,6 +66,8 @@
             $('#iframe').css('border', '0').hide();
             $('#iframe_div').hide();
             $('.tokens').show();
+            $('.no-iframe').show();
+            $('.owntoken').hide();
 
             if (e.data) {
                 var clientID = $('#clientID').val();
@@ -126,6 +129,29 @@
         })
             .on('keyup', function () {$(this).trigger('change')});
 
+        var $ownToken = $('#ownToken');
+
+        if (settings.token) {
+            $ownToken.prop('checked', true);
+            $('.owntoken').show();
+            $('.generate').hide();
+        } else {
+            $('.owntoken').hide();
+            $('.generate').show();
+        }
+
+        $ownToken.on('change', function () {
+            var val = $(this).prop('checked');
+            if (val) {
+                $('.owntoken').show();
+                $('.generate').hide();
+            } else {
+                $('.owntoken').hide();
+                $('.generate').show();
+                $('#token').val('');
+                onChange();
+            }
+        });
 
         onChange(false);
         M.updateTextFields();
@@ -141,6 +167,7 @@
                 obj[$this.attr('id')] = $this.val();
             }
         });
+
         obj.generate = $('#yes_generate ').prop('checked');
 
         callback(obj);
@@ -150,44 +177,99 @@
 <body>
 <div class="m adapter-container">
     <div class="row">
-        <div class="col s6">
-            <img src="fitbit-api.png" alt="logo" class="logo">
+        <div class="col s12">
+            <ul class="tabs">
+                <li class="tab col s2"><a href="#tab-main"      class="translate active">Main settings</a></li>
+                <li class="tab col s2"><a href="#tab-services"  class="translate">Services</a></li>
+            </ul>
         </div>
-    </div>
-    <div class="row">
-        <div class="input-field col s12 m6 l4">
-            <input class="value" id="clientID" type="text">
-            <label for="clientID">OAuth Client ID</label>
+        <div id="tab-main" class="col s12 page">
+            <div class="row">
+                <div class="col s6">
+                    <img src="fitbit-api.png" alt="logo" class="logo">
+                </div>
+            </div>
+            <div class="row no-iframe">
+                <div class="input-field col s12 m6 l4">
+                    <input id="ownToken" type="checkbox">
+                    <span for="ownToken" class="translate">I have yet an access token</span>
+                </div>
+            </div>
+            <div class="row owntoken no-iframe">
+                <div class="input-field col s12">
+                    <input class="value" id="token" type="text">
+                    <label for="token" class="translate">Access token</label>
+                </div>
+            </div>
+            <div class="row generate no-iframe">
+                <div class="input-field col s12 m6 l4">
+                    <input class="value" id="clientID" type="text">
+                    <label for="clientID" class="translate">OAuth Client ID</label>
+                    <span class="translate">You can obtain the client ID here: </span>
+                    <a href="https://dev.fitbit.com/apps" target="_blank">https://dev.fitbit.com/apps</a>
+                </div>
+            </div>
+            <div class="row generate no-iframe">
+                <div class="input-field col s12 m6 l4">
+                    <input class="value" id="clientSecret" type="text">
+                    <label for="clientSecret" class="translate">Client secret</label>
+                </div>
+            </div>
+            <div class="row generate no-iframe">
+                <a class="waves-effect waves-light btn blue table-button-do"><i class="material-icons">add</i><span class="translate">Authorize</span></a>
+            </div>
+            <div class="row generate" id="iframe_div">
+                <iframe id="iframe" name="iframe" src="" style="display: none; width: 100%; height: calc(100% - 50px); border: 0;"></iframe>
+            </div>
+            <div class="row tokens generate no-iframe">
+                <div class="input-field col s12">
+                    <input id="accessToken" type="text" readonly>
+                    <label for="accessToken" class="translate">Access token</label>
+                </div>
+            </div>
+            <div class="row tokens generate no-iframe">
+                <div class="input-field col s12">
+                    <input id="refreshToken" type="text" readonly>
+                    <label for="refreshToken" class="translate">Refresh token</label>
+                </div>
+            </div>
+            <div class="row tokens generate no-iframe">
+                <div class="input-field col s12 m6 l4">
+                    <input id="expireOn" type="text" readonly>
+                    <label for="expireOn" class="translate">Expires on</label>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="input-field col s12 m6 l4">
-            <input class="value" id="clientSecret" type="text">
-            <label for="clientSecret">Client secret</label>
-        </div>
-    </div>
-    <div class="row">
-        <a class="waves-effect waves-light btn blue table-button-do"><i class="material-icons">add</i><span class="translate">Authorize</span></a>
-    </div>
-    <div class="row" id="iframe_div">
-        <iframe id="iframe" name="iframe" src="" style="display: none; width: 100%; height: calc(100% - 295px); border: 0;"></iframe>
-    </div>
-    <div class="row tokens">
-        <div class="input-field col s12">
-            <input id="accessToken" type="text" readonly>
-            <label for="accessToken">Access token</label>
-        </div>
-    </div>
-    <div class="row tokens">
-        <div class="input-field col s12">
-            <input id="refreshToken" type="text" readonly>
-            <label for="refreshToken">Refresh token</label>
-        </div>
-    </div>
-    <div class="row tokens">
-        <div class="input-field col s12 m6 l4">
-            <input id="expireOn" type="text" readonly>
-            <label for="expireOn">Expires on</label>
+        <div id="tab-services" class="col s12 page">
+            <div class="row">
+                <div class="col s6">
+                    <img src="fitbit-api.png" alt="logo" class="logo">
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m6 l4">
+                    <input class="value" id="weight" type="checkbox">
+                    <span for="weight" class="translate">Weight</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m6 l4">
+                    <input class="value" id="fat" type="checkbox">
+                    <span for="fat" class="translate">Fat</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m6 l4">
+                    <input class="value" id="activities" type="checkbox">
+                    <span for="activities" class="translate">Activities</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m6 l4">
+                    <input class="value" id="devices" type="checkbox">
+                    <span for="devices" class="translate">Device battery</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>

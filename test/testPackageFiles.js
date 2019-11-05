@@ -2,18 +2,18 @@
 /* jshint strict:false */
 /* jslint node: true */
 /* jshint expr: true */
-var expect = require('chai').expect;
-var fs        = require('fs');
+const expect = require('chai').expect;
+const fs     = require('fs');
 
-describe('Test package.json and io-package.json', function() {
-    it('Test package files', function (done) {
+describe('Test package.json and io-package.json', () => {
+    it('Test package files', done => {
         console.log();
 
-        var fileContentIOPackage = fs.readFileSync(__dirname + '/../io-package.json', 'utf8');
-        var ioPackage = JSON.parse(fileContentIOPackage);
+        const fileContentIOPackage = fs.readFileSync(__dirname + '/../io-package.json', 'utf8');
+        const ioPackage = JSON.parse(fileContentIOPackage);
 
-        var fileContentNPMPackage = fs.readFileSync(__dirname + '/../package.json', 'utf8');
-        var npmPackage = JSON.parse(fileContentNPMPackage);
+        const fileContentNPMPackage = fs.readFileSync(__dirname + '/../package.json', 'utf8');
+        const npmPackage = JSON.parse(fileContentNPMPackage);
 
         expect(ioPackage).to.be.an('object');
         expect(npmPackage).to.be.an('object');
@@ -37,20 +37,21 @@ describe('Test package.json and io-package.json', function() {
                 if (ioPackage.common.authors.length === 1) {
                     expect(ioPackage.common.authors[0], 'ERROR: Author in io-package.json needs to be a real name').to.not.be.equal('my Name <my@email.com>');
                 }
-            }
-            else {
+            } else {
                 expect(ioPackage.common.authors, 'ERROR: Author in io-package.json needs to be a real name').to.not.be.equal('my Name <my@email.com>');
             }
-        }
-        else {
+        } else {
             console.log('WARNING: Testing for set authors field in io-package skipped because template adapter');
             console.log();
         }
+
         expect(fs.existsSync(__dirname + '/../README.md'), 'ERROR: README.md needs to exist! Please create one with description, detail information and changelog. English is mandatory.').to.be.true;
+
         if (!ioPackage.common.titleLang || typeof ioPackage.common.titleLang !== 'object') {
             console.log('WARNING: titleLang is not existing in io-package.json. Please add');
             console.log();
         }
+
         if (
             ioPackage.common.title.indexOf('iobroker') !== -1 ||
             ioPackage.common.title.indexOf('ioBroker') !== -1 ||
@@ -71,17 +72,20 @@ describe('Test package.json and io-package.json', function() {
             }
         }
 
-        var licenseFileExists = fs.existsSync(__dirname + '/../LICENSE');
-        var fileContentReadme = fs.readFileSync(__dirname + '/../README.md', 'utf8');
+        const licenseFileExists = fs.existsSync(__dirname + '/../LICENSE');
+        const fileContentReadme = fs.readFileSync(__dirname + '/../README.md', 'utf8');
         if (fileContentReadme.indexOf('## Changelog') === -1) {
             console.log('Warning: The README.md should have a section ## Changelog');
             console.log();
         }
+
         expect((licenseFileExists || fileContentReadme.indexOf('## License') !== -1), 'A LICENSE must exist as LICENSE file or as part of the README.md').to.be.true;
+
         if (!licenseFileExists) {
             console.log('Warning: The License should also exist as LICENSE file');
             console.log();
         }
+
         if (fileContentReadme.indexOf('## License') === -1) {
             console.log('Warning: The README.md should also have a section ## License to be shown in Admin3');
             console.log();

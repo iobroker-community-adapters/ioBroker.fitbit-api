@@ -1,10 +1,12 @@
 'use strict';
 
-const request     = require('request');
-const utils       = require('@iobroker/adapter-core'); // Get common adapter utils
-const adapterName = require('./package.json').name.split('.').pop();
+const request      = require('request');
+const utils        = require('@iobroker/adapter-core'); // Get common adapter utils
+const adapterName  = require('./package.json').name.split('.').pop();
 
-const BASE_URL = 'https://api.fitbit.com/1/user/';
+const BASE_URL     = 'https://api.fitbit.com/1/user/';
+const clientID     = '22BD68';
+const clientSecret = 'c4612114c93436901b6affb03a1e5ec8';
 
 let adapter;
 
@@ -36,10 +38,13 @@ function getDate() {
 }
 
 function requestProfile(token, adapter) {
+    if (adapter._profilePromise) {
+        return adapter._profilePromise;
+    }
     const url = `${BASE_URL}-/profile.json`;
     const headers = {Authorization: 'Bearer ' + token};
 
-    return new Promise((resolve, reject) => {
+    adapter._profilePromise = new Promise((resolve, reject) => {
         // read more here: https://dev.fitbit.com/build/reference/web-api/body/
 
         // const response = {
@@ -90,43 +95,8 @@ function requestProfile(token, adapter) {
             }
         });
     });
-}
 
-function createWeightObject(token, adapter) {
-    return new Promise((resolve, reject) => {
-        adapter.getObject('weight', (err, obj) => {
-            if (!obj || !obj.common || !obj.common.unit) {
-                return requestProfile(token, adapter)
-                    .then(user => {
-                        adapter.setObject('weight', {
-                            type: 'state',
-                            common: {
-                                name: 'weight',
-                                type: 'number',
-                                role: 'value.health.weight',
-                                unit: user.weightUnit === 'METRIC' ? 'kg' : (user.weightUnit === 'US' ? 'pounds' : 'stone'),
-                                read: true,
-                                write: false
-                            },
-                            native: {}
-                        }, () =>
-                            adapter.setObjectNotExists('bmi', {
-                                type: 'state',
-                                common: {
-                                    name: 'bmi',
-                                    type: 'number',
-                                    role: 'value.health.bmi',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            }, () => resolve()));
-                    });
-            } else {
-                resolve();
-            }
-        })
-    });
+    return adapter._profilePromise;
 }
 
 function requestWeight(token, adapter) {
@@ -156,15 +126,16 @@ function requestWeight(token, adapter) {
         //         }
         //     ]
         // };
-        return createWeightObject(token, adapter)
-            .then(() =>
-                request({url, headers}, (error, response, body) => {
-                    if (!error && response.statusCode === 200) {
-                        const data = JSON.parse(body);
-                        adapter.log.debug('weight: ' + JSON.stringify(data));
+        request({url, headers}, (error, response, body) => {
+            if (!error && response.statusCode === 200) {
+                const data = JSON.parse(body);
+                adapter.log.debug('weight: ' + JSON.stringify(data));
 
+                createObject(token, adapter, 'weight', {role: 'value.health.weight', unit: '%%WEIGHT%%'})
+                    .then(() => createObject(token, adapter, 'bmi', {role: 'value.health.bmi'}))
+                    .then(() => {
                         if (data && data.weight && data.weight.length) {
-                            const value = data.weight.shift();
+                            const value = data.weight.pop();
                             const date = new Date(`${value.date}T${value.time}`);
 
                             adapter.getState('weight', (err, state) => {
@@ -182,11 +153,38 @@ function requestWeight(token, adapter) {
                         } else {
                             reject('Weight is not found');
                         }
-                    } else {
-                        adapter.log.error('Cannot read weight: ' + (body || error || response.statusCode));
-                        reject('Cannot read weight: ' + (body || error || response.statusCode));
-                    }
-                }));
+                    });
+            } else {
+                adapter.log.error('Cannot read weight: ' + (body || error || response.statusCode));
+                reject('Cannot read weight: ' + (body || error || response.statusCode));
+            }
+        });
+    });
+}
+
+function createObject(token, adapter, name, common) {
+    return new Promise(resolve => {
+        adapter.getObject(name, (err, obj) => {
+            if (!obj) {
+                requestProfile(token, adapter)
+                    .then(user => {
+                        obj = {};
+                        obj.type = 'state';
+                        obj.common = common;
+                        obj.common.name = user.displayName + ' ' + name;
+                        obj.common.type = obj.common.type || 'number';
+                        if (common.unit === '%%WEIGHT%%') {
+                            common.unit = user.weightUnit === 'METRIC' ? 'kg' : (user.weightUnit === 'US' ? 'pounds' : 'stone');
+                        }
+                        obj.common.read = true;
+                        obj.common.write = false;
+                        obj.native = {};
+                        adapter.setObject(name, obj, () => resolve(user));
+                    });
+            } else {
+                resolve();
+            }
+        });
     });
 }
 
@@ -220,35 +218,26 @@ function requestBodyFat(token, adapter) {
                 const data = JSON.parse(body);
                 adapter.log.debug('Fat: ' + JSON.stringify(data));
 
-                adapter.setObjectNotExists('fat', {
-                    type: 'state',
-                    common: {
-                        name: 'fat',
-                        type: 'number',
-                        role: 'value.health.fat',
-                        unit: '%',
-                        read: true,
-                        write: false
-                    },
-                    native: {}
-                });
-                if (data && data.fat && data.fat.length) {
-                    const value = data.fat.shift();
-                    const date = new Date(`${value.date}T${value.time}`);
-                    adapter.getState('fat', (err, state) => {
-                        if (!state ||
-                            !state.val ||
-                            Math.abs(state.ts - date.getTime()) > 1000 || // one second difference
-                            Math.abs(state.val - value.fat) > 0.1) { // 0.1 difference
-                            adapter.setState('weight', {val: value.fat, ack: true, ts: date.getTime()}, () =>
-                                resolve());
+                createObject(token, adapter, 'fat', {role: 'value.health.fat', unit: '%',})
+                    .then(() => {
+                        if (data && data.fat && data.fat.length) {
+                            const value = data.fat.pop();
+                            const date = new Date(`${value.date}T${value.time}`);
+                            adapter.getState('fat', (err, state) => {
+                                if (!state ||
+                                    !state.val ||
+                                    Math.abs(state.ts - date.getTime()) > 1000 || // one second difference
+                                    Math.abs(state.val - value.fat) > 0.1) { // 0.1 difference
+                                    adapter.setState('fat', {val: value.fat, ack: true, ts: date.getTime()}, () =>
+                                        resolve());
+                                } else {
+                                    resolve();
+                                }
+                            });
                         } else {
-                            resolve();
+                            reject('fat is not found');
                         }
                     });
-                } else {
-                    reject('fat is not found');
-                }
             } else {
                 adapter.log.error('Cannot read fat: ' + (body || error || response.statusCode));
                 reject('Cannot read fat: ' + (body || error || response.statusCode));
@@ -315,22 +304,8 @@ function requestActivities(token, adapter) {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.debug('Profile: ' + JSON.stringify(data));
-
-                adapter.setObjectNotExists('steps', {
-                    type: 'state',
-                    common: {
-                        name: 'Steps done',
-                        type: 'number',
-                        unit: 'steps',
-                        read: true,
-                        write: false
-                    },
-                    native: {}
-                });
-                adapter.setObjectNotExists('restingHeartRate', {
-                    type: 'state',
-                    common: {
-                        name: 'Resting heart rate',
+                createObject(token, adapter, 'steps', {unit: 'steps'})
+                    .then(() => createObject(token, adapter, 'restingHeartRate', {
                         desc: {
                             "en": "The number of heart beats per minute while you are at rest",
                             "de": "Die Anzahl der Herzschläge pro Minute im Ruhezustand",
@@ -343,34 +318,21 @@ function requestActivities(token, adapter) {
                             "pl": "Liczba uderzeń serca na minutę podczas odpoczynku",
                             "zh-cn": "休息时每分钟的心跳次数"
                         },
-                        type: 'number',
-                        read: true,
-                        write: false
-                    },
-                    native: {}
-                });
-                adapter.setObjectNotExists('calories', {
-                    type: 'state',
-                    common: {
-                        name: 'Calories',
-                        type: 'number',
-                        unit: 'kcal',
-                        read: true,
-                        write: false
-                    },
-                    native: {}
-                });
+                        unit: 'bpm'
+                    }))
+                    .then(() => createObject(token, adapter, 'calories', {unit: 'kcal'}))
+                    .then(() => {
+                        if (data && data.summary) {
+                            const summary = data.summary;
 
-                if (data && data.summary) {
-                    const summary = data.summary;
-
-                    adapter.setState('steps',            summary.steps,            true);
-                    summary.restingHeartRate && adapter.setState('restingHeartRate', summary.restingHeartRate, true);
-                    adapter.setState('calories',         summary.caloriesOut,      true);
-                    resolve();
-                } else {
-                    reject('Activities not found');
-                }
+                            adapter.setState('steps', summary.steps, true);
+                            summary.restingHeartRate && adapter.setState('restingHeartRate', summary.restingHeartRate, true);
+                            adapter.setState('calories', summary.caloriesOut, true);
+                            resolve();
+                        } else {
+                            reject('Activities not found');
+                        }
+                    });
             } else {
                 adapter.log.error('Cannot read activities: ' + (body || error || response.statusCode));
                 reject('Cannot read activities: ' + (body || error || response.statusCode));
@@ -480,16 +442,17 @@ function checkToken(adapter) {
                             reject('No tokens. Please authenticate in configuration');
                         } else {
                             request({
-                                url: '',
+                                url: 'https://api.fitbit.com/oauth2/token',
                                 headers: {
-                                    Authorization: 'Basic ' + Buffer.from(adapter.config.clientID + ':' + adapter.config.clientSecret).toString('base64'),
+                                    Authorization: 'Basic ' + Buffer.from(clientID + ':' + clientSecret).toString('base64'),
                                     'Content-Type': 'application/x-www-form-urlencoded'
                                 },
                                 method: 'POST',
                                 body: 'grant_type=refresh_token&refresh_token=' + state.val
                             }, (error, state, body) => {
                                 if (error || state.statusCode !== 200 || !body) {
-                                    return reject('Cannot get new token: ' + (error || state.statusCode !== 200 || 'NO body'));
+                                    adapter.log.error('Cannot get new token: ' + (body || error || response.statusCode));
+                                    return reject('Cannot get new token: ' + (error || body || state.statusCode || 'NO body'));
                                 }
 
                                 if (typeof body !== 'object') {

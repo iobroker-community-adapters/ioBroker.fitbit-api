@@ -15,5 +15,17 @@ systemDictionary = {
     "Weight": {                                      "en": "Weight",                                          "de": "Gewicht",                                         "ru": "Вес",                                             "pt": "Peso",                                            "nl": "Gewicht",                                         "fr": "Poids",                                           "it": "Peso",                                            "es": "Weight",                                          "pl": "Waga",                                            "zh-cn": "重量"},
     "Fat": {                                         "en": "Fat",                                             "de": "Fettindex",                                       "ru": "Индекс жира",                                     "pt": "Gordura",                                         "nl": "Dik",                                             "fr": "Graisse",                                         "it": "Grasso",                                          "es": "Fat",                                             "pl": "Tłuszcz",                                         "zh-cn": "脂肪"},
     "Activities": {                                  "en": "Activities",                                      "de": "Aktivitäten",                                     "ru": "Мероприятия",                                     "pt": "Atividades",                                      "nl": "Activiteiten",                                    "fr": "Activités",                                       "it": "attività",                                        "es": "Activities",                                      "pl": "Zajęcia",                                         "zh-cn": "活动项目"},
-    "Device battery": {                              "en": "Device battery",                                  "de": "Gerätebatterie",                                  "ru": "Состояние батареи устройств",                     "pt": "Bateria do dispositivo",                          "nl": "Apparaat batterij",                               "fr": "Batterie de l'appareil",                          "it": "Batteria del dispositivo",                        "es": "Device battery",                                  "pl": "Bateria urządzenia",                              "zh-cn": "设备电池"}
+    "Device battery": {                              "en": "Device battery",                                  "de": "Gerätebatterie",                                  "ru": "Состояние батареи устройств",                     "pt": "Bateria do dispositivo",                          "nl": "Apparaat batterij",                               "fr": "Batterie de l'appareil",                          "it": "Batteria del dispositivo",                        "es": "Device battery",                                  "pl": "Bateria urządzenia",                              "zh-cn": "设备电池"},
+    "Update token": {
+        "en": "Update token",
+        "de": "Token aktualisieren",
+        "ru": "Обновить токен",
+        "pt": "Atualizar token",
+        "nl": "Update token",
+        "fr": "Jeton de mise à jour",
+        "it": "Token di aggiornamento",
+        "es": "Token de actualización",
+        "pl": "Zaktualizuj token",
+        "zh-cn": "更新令牌"
+    }
 };

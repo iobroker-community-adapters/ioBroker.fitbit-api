@@ -14,6 +14,9 @@
 <script type="text/javascript" src="words.js"></script>
 
 <script type="text/javascript">
+    var clientID = '22BD68';
+    var clientSecret = 'c4612114c93436901b6affb03a1e5ec8';
+
     function load(settings, onChange) {
         if (!settings) {
            return;
@@ -48,7 +51,6 @@
         });
 
         $('.table-button-do').on('click', function () {
-            var clientID = $('#clientID').val();
             var url = 'https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=' + clientID + '&redirect_uri=https%3A%2F%2Foauth.iobroker.in%2Ftoken&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=2592000000';
             var $iframe = $('#iframe');
             $('#iframe_div').show();
@@ -70,9 +72,6 @@
             $('.owntoken').hide();
 
             if (e.data) {
-                var clientID = $('#clientID').val();
-                var clientSecret = $('#clientSecret').val();
-
                 $.ajax({
                     url: 'https://api.fitbit.com/oauth2/token',
                     type: 'POST',
@@ -106,29 +105,11 @@
         });
         socket.emit('getState', 'fitbit-api.' + instance + '.tokens.expire', function (err, state) {
             $('#expireOn').val(state ? state.val || '' : '');
+            if (state && state.val) {
+                $('.table-button-do span').html(_('Update token'));
+            }
             setTimeout(function () {M.updateTextFields()}, 500);
         });
-        if (!settings.clientID || !settings.clientSecret) {
-            $('.table-button-do').addClass('disabled');
-        }
-        $('#clientID').on('change', function () {
-            if (!$('#clientID').val() || !$('#clientSecret').val()) {
-                $('.table-button-do').addClass('disabled');
-            } else {
-                $('.table-button-do').removeClass('disabled');
-            }
-        })
-            .on('keyup', function () {$(this).trigger('change')});
-
-        $('#clientSecret').on('change', function () {
-            if (!$('#clientID').val() || !$('#clientSecret').val()) {
-                $('.table-button-do').addClass('disabled');
-            } else {
-                $('.table-button-do').removeClass('disabled');
-            }
-        })
-            .on('keyup', function () {$(this).trigger('change')});
-
         var $ownToken = $('#ownToken');
 
         if (settings.token) {
@@ -199,20 +180,6 @@
                 <div class="input-field col s12">
                     <input class="value" id="token" type="text">
                     <label for="token" class="translate">Access token</label>
-                </div>
-            </div>
-            <div class="row generate no-iframe">
-                <div class="input-field col s12 m6 l4">
-                    <input class="value" id="clientID" type="text">
-                    <label for="clientID" class="translate">OAuth Client ID</label>
-                    <span class="translate">You can obtain the client ID here: </span>
-                    <a href="https://dev.fitbit.com/apps" target="_blank">https://dev.fitbit.com/apps</a>
-                </div>
-            </div>
-            <div class="row generate no-iframe">
-                <div class="input-field col s12 m6 l4">
-                    <input class="value" id="clientSecret" type="text">
-                    <label for="clientSecret" class="translate">Client secret</label>
                 </div>
             </div>
             <div class="row generate no-iframe">

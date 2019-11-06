@@ -456,7 +456,7 @@ function checkToken(adapter) {
                                 }
 
                                 if (typeof body !== 'object') {
-                                    body = JSON.stringify(body);
+                                    body = JSON.parse(body);
                                 }
 
                                 const time = new Date();

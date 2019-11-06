@@ -18,7 +18,7 @@
         },
 		"title": "fitbit API",
         "desc": {
-            "en": "This adapter pull Data from fitbit API",
+            "en": "This adapter pulls Data from fitbit API",
             "de": "Dieser Adapter zieht Daten aus der Fitbit-API",
             "ru": "Этот адаптер извлекает данные из fitbit API",
             "pt": "Este adaptador extrai dados da API fitbit",

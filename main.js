@@ -39,9 +39,10 @@ function getDate() {
 
 function requestProfile(token, adapter) {
     if (adapter._profilePromise) {
-        return adapter._profilePromise;
+        return adapter._profilePromise;  //myhelp
     }
     const url = `${BASE_URL}-/profile.json`;
+    const url1 = `${BASE_URL}-/profile.json`;
     const headers = {Authorization: 'Bearer ' + token};
 
     adapter._profilePromise = new Promise((resolve, reject) => {

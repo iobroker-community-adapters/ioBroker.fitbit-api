@@ -2,6 +2,7 @@
 # ioBroker.fitbit
 
 This adapter pulls Data from fitbit API!
+Test
 
 ## Configuration
 ![step1](img/step1.png)

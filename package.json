@@ -6,10 +6,10 @@
   "contributors": [
     "bluefox <dogafox@gmail.com>"
   ],
-  "homepage": "https://github.com/iobroker-community-adapters/ioBroker.fitbit-api",
+  "homepage": "https://github.com/Chris-1965/ioBroker.fitbit-api",
   "repository": {
     "type": "git",
-    "url": "https://github.com/iobroker-community-adapters/ioBroker.fitbit-api"
+    "url": "https://github.com/Chris-1965/ioBroker.fitbit-api"
   },
   "keywords": [
     "fitbit",
@@ -27,7 +27,7 @@
     "chai": "^4.2.0"
   },
   "bugs": {
-    "url": "https://github.com/iobroker-community-adapters/ioBroker.fitbit-api/issues"
+    "url": "https://github.com/Chris-1965/ioBroker.fitbit-api/issues"
   },
   "main": "main.js",
   "scripts": {

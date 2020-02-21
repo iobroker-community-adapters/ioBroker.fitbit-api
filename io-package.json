@@ -41,7 +41,7 @@
         "enabled": true,
         "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.fitbit-api/master/admin/fitbit-api.png",
         "keywords": ["fitbit", "scale", "weight"],
-        "readme": "https://github.com/iobroker-community-adapters/ioBroker.fitbit-api/blob/master/README.md",
+        "readme": "https://github.com/Chris-1965/ioBroker.fitbit-api/blob/master/README.md",
         "loglevel": "info",
         "type": "health",
         "license": "MIT"

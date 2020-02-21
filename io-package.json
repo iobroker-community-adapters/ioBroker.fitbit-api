@@ -51,6 +51,7 @@
         "weight": false,
         "fat": false,
         "activities": false,
+        "sleep": false,
         "devices": true
     },
     "instanceObjects": [

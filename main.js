@@ -353,6 +353,8 @@ function requestSleep(token, adapter) {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.error('Profile: ' + JSON.stringify(data));
+                adapter.log.error('sleepEfficiency: ' + data.sleep[0].sleepEfficiency);
+
                 createObject(token, adapter, 'sleepMinutesAsleep', { unit: 'minutes' })
                     .then(() => createObject(token, adapter, 'sleepDeep', {  unit: 'minutes' }))
                     .then(() => createObject(token, adapter, 'sleepLight', { unit: 'minutes' }))

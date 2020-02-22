@@ -353,7 +353,7 @@ function requestSleep(token, adapter) {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.error('Profile: ' + JSON.stringify(data));
-                adapter.log.error('sleepEfficiency: ' + data.sleep[0].sleepEfficiency);
+                adapter.log.error('sleepEfficiency: ' + data.sleep[0].efficiency);
 
                 createObject(token, adapter, 'sleepMinutesAsleep', { unit: 'minutes' })
                     .then(() => createObject(token, adapter, 'sleepDeep', {  unit: 'minutes' }))
@@ -362,7 +362,7 @@ function requestSleep(token, adapter) {
                     .then(() => createObject(token, adapter, 'sleepEfficiency'))
                     .then(() => {
                         adapter.log.error("test");
-                        adapter.log.error('sleepEfficiency: ' + data.sleep[0].sleepEfficiency);
+                        adapter.log.error('sleepEfficiency: ' + data.sleep[0].efficiency);
                         //adapter.log.info('sleepEfficiency: ' + data.sleep[0].sleepEfficiency);
                         if (data) {
                             const dataMainSleep = data.sleep.find(el => el.isMainSleep);

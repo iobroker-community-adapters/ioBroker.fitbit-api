@@ -349,10 +349,10 @@ function requestSleep(token, adapter) {
 
     return new Promise((resolve, reject) => {
         request({ url, headers }, (error, response, body) => {
-            adapter.log.debug('Trying to get sleep data');
+            adapter.log.error('Trying to get sleep data');
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
-                adapter.log.debug('Profile: ' + JSON.stringify(data));
+                adapter.log.error('Profile: ' + JSON.stringify(data));
                 createObject(token, adapter, 'sleepMinutesAsleep', { unit: 'minutes' })
                     .then(() => createObject(token, adapter, 'sleepDeep', {  unit: 'minutes' }))
                     .then(() => createObject(token, adapter, 'sleepLight', { unit: 'minutes' }))

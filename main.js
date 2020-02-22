@@ -356,10 +356,10 @@ function requestSleep(token, adapter) {
                 adapter.log.error('sleepEfficiency: ' + data.sleep[0].efficiency);
 
                 createObject(token, adapter, 'sleepMinutesAsleep', { unit: 'minutes' })
-                    .then(() => createObject(token, adapter, 'sleepDeep', {  unit: 'minutes' }))
-                    .then(() => createObject(token, adapter, 'sleepLight', { unit: 'minutes' }))
-                    .then(() => createObject(token, adapter, 'sleepRem', { unit: 'minutes' }))
-                    .then(() => createObject(token, adapter, 'sleepEfficiency'))
+                    //.then(() => createObject(token, adapter, 'sleepDeep', {  unit: 'minutes' }))
+                    //.then(() => createObject(token, adapter, 'sleepLight', { unit: 'minutes' }))
+                    //.then(() => createObject(token, adapter, 'sleepRem', { unit: 'minutes' }))
+                    //.then(() => createObject(token, adapter, 'sleepEfficiency',{ unit: 'eff' }))
                     .then(() => {
                         adapter.log.error("test");
                         adapter.log.error('sleepEfficiency: ' + data.sleep[0].efficiency);

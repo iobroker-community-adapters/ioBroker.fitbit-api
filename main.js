@@ -375,13 +375,13 @@ function requestSleep(token, adapter) {
                             const sleepLight = dataMainSleep.levels.summary.light.minutes;
                             const sleepRem = dataMainSleep.levels.summary.rem.minutes;
                             const sleepEfficiency = dataMainSleep.efficiency;
-                            adapter.log.debug('Data: '+minutesAsleep.toString());
- 
+                         
                             adapter.setState('sleepMinutesAsleep', minutesAsleep, true);
                             adapter.setState('sleepDeep', sleepDeep, true);
                             adapter.setState('sleepLight', sleepLight, true);
                             adapter.setState('sleepRem', sleepRem, true);
                             adapter.setState('sleepEfficiency', sleepEfficiency, true);
+
                             resolve();
                         } else {
                             reject('Sleep Records not found');

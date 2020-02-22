@@ -349,44 +349,46 @@ function requestSleep(token, adapter) {
 
     return new Promise((resolve, reject) => {
         request({ url, headers }, (error, response, body) => {
-            adapter.log.error('Trying to get sleep data');
+            adapter.log.info('Trying to get sleep data');
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
-                adapter.log.error('Profile: ' + JSON.stringify(data));
-                adapter.log.error('sleepEfficiency: ' + data.sleep[0].efficiency);
+                const dataMainSleep = data.sleep.find(el => el.isMainSleep);
 
-                createObject(token, adapter, 'sleepMinutesAsleep', { unit: 'minutes' })
-                    //.then(() => createObject(token, adapter, 'sleepDeep', {  unit: 'minutes' }))
-                    //.then(() => createObject(token, adapter, 'sleepLight', { unit: 'minutes' }))
-                    //.then(() => createObject(token, adapter, 'sleepRem', { unit: 'minutes' }))
-                    //.then(() => createObject(token, adapter, 'sleepEfficiency',{ unit: 'eff' }))
+                //adapter.log.info('NNN Profile: ' + JSON.stringify(data));
+ 
+                createObject(token, adapter, 'sleep.MinutesAsleep', { unit: 'minutes' })
                     .then(() => {
-                        adapter.log.error('sleepEfficiency: ' + data.sleep[0].efficiency);
-                        //adapter.log.info('sleepEfficiency: ' + data.sleep[0].sleepEfficiency);
-                        if (data) {
-                            adapter.log.error("test");
-
-                            const dataMainSleep = data.sleep.find(el => el.isMainSleep);
-
-                            const minutesAsleep = dataMainSleep.minutesAsleep;
-                            adapter.log.error("asleep:"+minutesAsleep.toString());
-
-                            const sleepDeep = dataMainSleep.levels.summary.deep.minutes;
-                            const sleepLight = dataMainSleep.levels.summary.light.minutes;
-                            const sleepRem = dataMainSleep.levels.summary.rem.minutes;
-                            const sleepEfficiency = dataMainSleep.efficiency;
-                         
-                            adapter.setState('sleepMinutesAsleep', minutesAsleep, true);
-                            adapter.setState('sleepDeep', sleepDeep, true);
-                            adapter.setState('sleepLight', sleepLight, true);
-                            adapter.setState('sleepRem', sleepRem, true);
-                            adapter.setState('sleepEfficiency', sleepEfficiency, true);
-
-                            resolve();
-                        } else {
-                            reject('Sleep Records not found');
-                        }
+                        const minutesAsleep = dataMainSleep.minutesAsleep;
+                        adapter.setState('sleep.MinutesAsleep', minutesAsleep, true);
+                        adapter.log.info("asleep: " + minutesAsleep.toString());
                     });
+                createObject(token, adapter, 'sleep.Deep', { unit: 'minutes' })
+                    .then(() => {
+                        const sleepDeep = dataMainSleep.levels.summary.deep.minutes;
+                        adapter.setState('sleep.Deep', sleepDeep, true);
+                        adapter.log.info("deep: " + sleepDeep.toString());
+                    });
+                createObject(token, adapter, 'sleep.Light', { unit: 'minutes' })
+                    .then(() => {
+                        const sleepLight = dataMainSleep.levels.summary.light.minutes;
+                        adapter.setState('sleep.Light', sleepLight, true);
+                        adapter.log.info("light: " + sleepLight.toString());
+                    });
+                createObject(token, adapter, 'sleep.Rem', { unit: 'minutes' })
+                    .then(() => {
+                        const sleepRem = dataMainSleep.levels.summary.rem.minutes;
+                        adapter.setState('sleep.Rem', sleepRem, true);
+                        adapter.log.info("rem: " + sleepRem.toString());
+                    });
+
+                createObject(token, adapter, 'sleepEfficiency', )
+                    .then(() => {
+                        const sleepEfficiency = dataMainSleep.efficiency;
+                        adapter.log.info('sleepEfficiency: ' + data.sleep[0].efficiency);
+                        adapter.setState('sleepEfficiency', sleepEfficiency, true);
+                    });
+
+                resolve();
             } else {
                 adapter.log.error('Cannot read sleep records: ' + (body || error || response.statusCode));
                 reject('Cannot read sleep records: ' + (body || error || response.statusCode));

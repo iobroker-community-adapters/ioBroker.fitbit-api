@@ -361,13 +361,16 @@ function requestSleep(token, adapter) {
                     //.then(() => createObject(token, adapter, 'sleepRem', { unit: 'minutes' }))
                     //.then(() => createObject(token, adapter, 'sleepEfficiency',{ unit: 'eff' }))
                     .then(() => {
-                        adapter.log.error("test");
                         adapter.log.error('sleepEfficiency: ' + data.sleep[0].efficiency);
                         //adapter.log.info('sleepEfficiency: ' + data.sleep[0].sleepEfficiency);
                         if (data) {
+                            adapter.log.error("test");
+
                             const dataMainSleep = data.sleep.find(el => el.isMainSleep);
 
                             const minutesAsleep = dataMainSleep.minutesAsleep;
+                            adapter.log.error("asleep:"+minutesAsleep.toString());
+
                             const sleepDeep = dataMainSleep.levels.summary.deep.minutes;
                             const sleepLight = dataMainSleep.levels.summary.light.minutes;
                             const sleepRem = dataMainSleep.levels.summary.rem.minutes;

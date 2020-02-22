@@ -359,8 +359,9 @@ function requestSleep(token, adapter) {
                     .then(() => createObject(token, adapter, 'sleepRem', { unit: 'minutes' }))
                     .then(() => createObject(token, adapter, 'sleepEfficiency'))
                     .then(() => {
+                        adapter.log.error("test");
                         adapter.log.error('sleepEfficiency: ' + data.sleep[0].sleepEfficiency);
-                        adapter.log.info('sleepEfficiency: ' + data.sleep[0].sleepEfficiency);
+                        //adapter.log.info('sleepEfficiency: ' + data.sleep[0].sleepEfficiency);
                         if (data) {
                             const dataMainSleep = data.sleep.find(el => el.isMainSleep);
 

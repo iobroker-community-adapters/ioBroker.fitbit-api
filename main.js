@@ -5,6 +5,7 @@ const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 const adapterName = require('./package.json').name.split('.').pop();
 
 const BASE_URL = 'https://api.fitbit.com/1/user/';
+const BASE2_URL = 'https://api.fitbit.com/1.2/user/';
 const clientID = '22BD68';
 const clientSecret = 'c4612114c93436901b6affb03a1e5ec8';
 
@@ -342,17 +343,18 @@ function requestActivities(token, adapter) {
 }
 
 function requestSleep(token, adapter) {
-    const url = `${BASE_URL}-/sleep/date/${getDate()}.json`;
+    const url = `${BASE2_URL}-/sleep/date/${getDate()}.json`;
     // https://api.fitbit.com/1.2/user/-/sleep/date/2020-02-21.json
     const headers = { Authorization: 'Bearer ' + token };
 
     return new Promise((resolve, reject) => {
         request({ url, headers }, (error, response, body) => {
+            adapter.log.debug('Trying to get sleep data');
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.debug('Profile: ' + JSON.stringify(data));
                 createObject(token, adapter, 'sleepMinutesAsleep', { unit: 'minutes' })
-                    .then(() => createObject(token, adapter, 'sleepDeep', { unit: 'minutes' }))
+                    .then(() => createObject(token, adapter, 'sleepDeep', {  unit: 'minutes' }))
                     .then(() => createObject(token, adapter, 'sleepLight', { unit: 'minutes' }))
                     .then(() => createObject(token, adapter, 'sleepRem', { unit: 'minutes' }))
                     .then(() => createObject(token, adapter, 'sleepEfficiency'))
@@ -365,7 +367,8 @@ function requestSleep(token, adapter) {
                             const sleepLight = dataMainSleep.levels.summary.light.minutes;
                             const sleepRem = dataMainSleep.levels.summary.rem.minutes;
                             const sleepEfficiency = dataMainSleep.efficiency;
-
+                            adapter.log.debug('Data: '+minutesAsleep.toString());
+ 
                             adapter.setState('sleepMinutesAsleep', minutesAsleep, true);
                             adapter.setState('sleepDeep', sleepDeep, true);
                             adapter.setState('sleepLight', sleepLight, true);

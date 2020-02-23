@@ -31,6 +31,8 @@ The API was implemented according to https://dev.fitbit.com/build/reference/web-
 
 ## Changelog
 
+### 0.1.2 (2020-02-21)
+* (chris.1965) added sleep records 
 ### 0.1.1 (2019-11-06)
 * (bluefox) initial release
 

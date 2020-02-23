@@ -42,7 +42,7 @@ function requestProfile(token, adapter) {
         return adapter._profilePromise;  //myhelp
     }
     const url = `${BASE_URL}-/profile.json`;
-    const url1 = `${BASE_URL}-/profile.json`;
+    const url2 = `${BASE_URL}-/profile.json`;
     const headers = {Authorization: 'Bearer ' + token};
 
     adapter._profilePromise = new Promise((resolve, reject) => {

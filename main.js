@@ -1,18 +1,19 @@
 'use strict';
 
-const request      = require('request');
-const utils        = require('@iobroker/adapter-core'); // Get common adapter utils
-const adapterName  = require('./package.json').name.split('.').pop();
+const request = require('request');
+const utils = require('@iobroker/adapter-core'); // Get common adapter utils
+const adapterName = require('./package.json').name.split('.').pop();
 
-const BASE_URL     = 'https://api.fitbit.com/1/user/';
-const clientID     = '22BD68';
+const BASE_URL = 'https://api.fitbit.com/1/user/';
+const BASE2_URL = 'https://api.fitbit.com/1.2/user/';
+const clientID = '22BD68';
 const clientSecret = 'c4612114c93436901b6affb03a1e5ec8';
 
 let adapter;
 
 function startAdapter(options) {
     options = options || {};
-    options = Object.assign({}, options, {name: adapterName});
+    options = Object.assign({}, options, { name: adapterName });
 
     adapter = new utils.Adapter(options);
 
@@ -39,11 +40,10 @@ function getDate() {
 
 function requestProfile(token, adapter) {
     if (adapter._profilePromise) {
-        return adapter._profilePromise;  //myhelp
+        return adapter._profilePromise;
     }
     const url = `${BASE_URL}-/profile.json`;
-    const url2 = `${BASE_URL}-/profile.json`;
-    const headers = {Authorization: 'Bearer ' + token};
+    const headers = { Authorization: 'Bearer ' + token };
 
     adapter._profilePromise = new Promise((resolve, reject) => {
         // read more here: https://dev.fitbit.com/build/reference/web-api/body/
@@ -80,7 +80,7 @@ function requestProfile(token, adapter) {
         //         "weightUnit":<value>
         //     }
         // };
-        request({url, headers}, (error, response, body) => {
+        request({ url, headers }, (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.debug('Profile: ' + JSON.stringify(data));
@@ -102,7 +102,7 @@ function requestProfile(token, adapter) {
 
 function requestWeight(token, adapter) {
     const url = `${BASE_URL}-/body/log/weight/date/${getDate()}.json`;
-    const headers = {Authorization: 'Bearer ' + token};
+    const headers = { Authorization: 'Bearer ' + token };
 
     return new Promise((resolve, reject) => {
         // read more here: https://dev.fitbit.com/build/reference/web-api/body/
@@ -127,13 +127,13 @@ function requestWeight(token, adapter) {
         //         }
         //     ]
         // };
-        request({url, headers}, (error, response, body) => {
+        request({ url, headers }, (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.debug('weight: ' + JSON.stringify(data));
 
-                createObject(token, adapter, 'weight', {role: 'value.health.weight', unit: '%%WEIGHT%%'})
-                    .then(() => createObject(token, adapter, 'bmi', {role: 'value.health.bmi'}))
+                createObject(token, adapter, 'weight', { role: 'value.health.weight', unit: '%%WEIGHT%%' })
+                    .then(() => createObject(token, adapter, 'bmi', { role: 'value.health.bmi' }))
                     .then(() => {
                         if (data && data.weight && data.weight.length) {
                             const value = data.weight.pop();
@@ -141,18 +141,20 @@ function requestWeight(token, adapter) {
 
                             adapter.getState('weight', (err, state) => {
                                 if (!state ||
-                                    !state.val ||
+                                    !state.val || 
                                     Math.abs(state.ts - date.getTime()) > 1000 || // one second difference
                                     Math.abs(state.val - value.weight) > 0.1) { // 0.1 difference
-                                    adapter.setState('weight', {val: value.weight, ack: true, ts: date.getTime()}, () =>
-                                        adapter.setState('bmi', {val: value.bmi, ack: true, ts: date.getTime()}, () =>
+                                    adapter.setState('weight', { val: value.weight, ack: true, ts: date.getTime() }, () =>
+                                        adapter.setState('bmi', { val: value.bmi, ack: true, ts: date.getTime() }, () =>
                                             resolve()));
                                 } else {
                                     resolve();
                                 }
                             });
                         } else {
-                            reject('Weight is not found');
+                            adapter.log.warn('Weight record for today is not found');
+                            resolve();
+                            //reject('Weight is not found');
                         }
                     });
             } else {
@@ -191,7 +193,7 @@ function createObject(token, adapter, name, common) {
 
 function requestBodyFat(token, adapter) {
     const url = `${BASE_URL}-/body/log/fat/date/${getDate()}.json`;
-    const headers = {Authorization: 'Bearer ' + token};
+    const headers = { Authorization: 'Bearer ' + token };
 
     return new Promise((resolve, reject) => {
         // read more here: https://dev.fitbit.com/build/reference/web-api/body/
@@ -214,12 +216,12 @@ function requestBodyFat(token, adapter) {
         //         }
         //     ]
         // };
-        request({url, headers}, (error, response, body) => {
+        request({ url, headers }, (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.debug('Fat: ' + JSON.stringify(data));
 
-                createObject(token, adapter, 'fat', {role: 'value.health.fat', unit: '%',})
+                createObject(token, adapter, 'fat', { role: 'value.health.fat', unit: '%', })
                     .then(() => {
                         if (data && data.fat && data.fat.length) {
                             const value = data.fat.pop();
@@ -229,14 +231,16 @@ function requestBodyFat(token, adapter) {
                                     !state.val ||
                                     Math.abs(state.ts - date.getTime()) > 1000 || // one second difference
                                     Math.abs(state.val - value.fat) > 0.1) { // 0.1 difference
-                                    adapter.setState('fat', {val: value.fat, ack: true, ts: date.getTime()}, () =>
+                                    adapter.setState('fat', { val: value.fat, ack: true, ts: date.getTime() }, () =>
                                         resolve());
                                 } else {
                                     resolve();
                                 }
                             });
                         } else {
-                            reject('fat is not found');
+                            adapter.log.warn('Fat record for today is not found');
+                            resolve(); 
+                            //reject('fat is not found');
                         }
                     });
             } else {
@@ -249,7 +253,7 @@ function requestBodyFat(token, adapter) {
 
 function requestActivities(token, adapter) {
     const url = `${BASE_URL}-/activities/date/${getDate()}.json`;
-    const headers = {Authorization: 'Bearer ' + token};
+    const headers = { Authorization: 'Bearer ' + token };
 
     return new Promise((resolve, reject) => {
         // read more here: https://dev.fitbit.com/build/reference/web-api/user/
@@ -301,11 +305,11 @@ function requestActivities(token, adapter) {
         //         "veryActiveMinutes":0
         //     }
         // };
-        request({url, headers}, (error, response, body) => {
+        request({ url, headers }, (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.debug('Profile: ' + JSON.stringify(data));
-                createObject(token, adapter, 'steps', {unit: 'steps'})
+                createObject(token, adapter, 'steps', { unit: 'steps' })
                     .then(() => createObject(token, adapter, 'restingHeartRate', {
                         desc: {
                             "en": "The number of heart beats per minute while you are at rest",
@@ -321,7 +325,7 @@ function requestActivities(token, adapter) {
                         },
                         unit: 'bpm'
                     }))
-                    .then(() => createObject(token, adapter, 'calories', {unit: 'kcal'}))
+                    .then(() => createObject(token, adapter, 'calories', { unit: 'kcal' }))
                     .then(() => {
                         if (data && data.summary) {
                             const summary = data.summary;
@@ -342,9 +346,64 @@ function requestActivities(token, adapter) {
     });
 }
 
+function requestSleep(token, adapter) {
+    const url = `${BASE2_URL}-/sleep/date/${getDate()}.json`;
+    // https://api.fitbit.com/1.2/user/-/sleep/date/2020-02-21.json
+    const headers = { Authorization: 'Bearer ' + token };
+
+    return new Promise((resolve, reject) => {
+        request({ url, headers }, (error, response, body) => {
+            adapter.log.info('Retrieving sleep data');
+            if (!error && response.statusCode === 200) {
+                const data = JSON.parse(body);
+                const dataMainSleep = data.sleep.find(el => el.isMainSleep);
+
+                //adapter.log.info('NNN Profile: ' + JSON.stringify(data));
+ 
+                createObject(token, adapter, 'sleep.MinutesAsleep', { unit: 'minutes' })
+                    .then(() => {
+                        const minutesAsleep = dataMainSleep.minutesAsleep;
+                        adapter.setState('sleep.MinutesAsleep', minutesAsleep, true);
+                        adapter.log.info("asleep: " + minutesAsleep.toString());
+                    });
+                createObject(token, adapter, 'sleep.Deep', { unit: 'minutes' })
+                    .then(() => {
+                        const sleepDeep = dataMainSleep.levels.summary.deep.minutes;
+                        adapter.setState('sleep.Deep', sleepDeep, true);
+                        adapter.log.info("deep: " + sleepDeep.toString());
+                    });
+                createObject(token, adapter, 'sleep.Light', { unit: 'minutes' })
+                    .then(() => {
+                        const sleepLight = dataMainSleep.levels.summary.light.minutes;
+                        adapter.setState('sleep.Light', sleepLight, true);
+                        adapter.log.info("light: " + sleepLight.toString());
+                    });
+                createObject(token, adapter, 'sleep.Rem', { unit: 'minutes' })
+                    .then(() => {
+                        const sleepRem = dataMainSleep.levels.summary.rem.minutes;
+                        adapter.setState('sleep.Rem', sleepRem, true);
+                        adapter.log.info("rem: " + sleepRem.toString());
+                    });
+
+                createObject(token, adapter, 'sleepEfficiency', )
+                    .then(() => {
+                        const sleepEfficiency = dataMainSleep.efficiency;
+                        adapter.log.info('sleepEfficiency: ' + data.sleep[0].efficiency);
+                        adapter.setState('sleepEfficiency', sleepEfficiency, true);
+                    });
+
+                resolve();
+            } else {
+                adapter.log.error('Cannot read sleep records: ' + (body || error || response.statusCode));
+                reject('Cannot read sleep records: ' + (body || error || response.statusCode));
+            }
+        });
+    });
+}
+
 function requestDevices(token, adapter) {
     const url = `${BASE_URL}-/devices.json`;
-    const headers = {Authorization: 'Bearer ' + token};
+    const headers = { Authorization: 'Bearer ' + token };
 
     return new Promise((resolve, reject) => {
         // read more here: https://dev.fitbit.com/build/reference/web-api/devices/
@@ -372,7 +431,7 @@ function requestDevices(token, adapter) {
         //         "type": "SCALE"
         //     }
         // ];
-        request({url, headers}, (error, response, body) => {
+        request({ url, headers }, (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.debug('Devices: ' + JSON.stringify(data));
@@ -401,7 +460,7 @@ function requestDevices(token, adapter) {
                                         !state.val ||
                                         Math.abs(state.ts - date.getTime()) > 1000 || // one second difference
                                         value !== state.val) {
-                                        adapter.setState(id, {val: value, ack: true, ts: date.getTime()}, () =>
+                                        adapter.setState(id, { val: value, ack: true, ts: date.getTime() }, () =>
                                             resolve());
                                     } else {
                                         resolve();
@@ -482,10 +541,11 @@ function main(adapter) {
         .then(token => {
             const promises = [];
 
-            adapter.config.weight     && promises.push(requestWeight(token, adapter));
-            adapter.config.fat        && promises.push(requestBodyFat(token, adapter));
+            adapter.config.weight && promises.push(requestWeight(token, adapter));
+            adapter.config.fat && promises.push(requestBodyFat(token, adapter));
             adapter.config.activities && promises.push(requestActivities(token, adapter));
-            adapter.config.devices    && promises.push(requestDevices(token, adapter));
+            adapter.config.sleep && promises.push(requestSleep(token, adapter));
+            adapter.config.devices && promises.push(requestDevices(token, adapter));
 
             !promises.length && adapter.log.error('No one option is enabled. Please enable what kind of data do you want to have in adapter configuration!');
 

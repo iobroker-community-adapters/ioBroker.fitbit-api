@@ -349,7 +349,7 @@ function requestSleep(token, adapter) {
 
     return new Promise((resolve, reject) => {
         request({ url, headers }, (error, response, body) => {
-            adapter.log.info('Trying to get sleep data');
+            adapter.log.info('Retrieving sleep data');
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 const dataMainSleep = data.sleep.find(el => el.isMainSleep);

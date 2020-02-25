@@ -348,7 +348,7 @@ function requestSleep(token, adapter) {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 const dataMainSleep = data.sleep.find(el => el.isMainSleep);
-                const date = new Date(dataMainSleep.endTime);
+                const date = new Date(dataMainSleep.endTime);               // Get date from the sleep record
                 
                 adapter.log.info('Sleep Date: ' + date.getTime().toString());
 

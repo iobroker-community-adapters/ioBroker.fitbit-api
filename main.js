@@ -348,13 +348,13 @@ function requestSleep(token, adapter) {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 const dataMainSleep = data.sleep.find(el => el.isMainSleep);
-                const date = new Date(dataMainSleep.endTime);               // Get date from the sleep record
-                
+                const date = new Date(dataMainSleep.endTime);
+
                 adapter.log.info('Sleep Date: ' + date.getTime().toString());
 
                 createObject(token, adapter, 'sleep.MinutesAsleep', { unit: 'minutes' })
                     .then(() => {
-                        const minutesAsleep = dataMainSleep.minutesAsleep;                      
+                        const minutesAsleep = dataMainSleep.minutesAsleep;
                         adapter.setState('sleep.MinutesAsleep', { val: minutesAsleep, ack: true, ts: date.getTime() });
                         adapter.log.info("MinutesAsleep: " + minutesAsleep.toString());
                     });
@@ -387,6 +387,71 @@ function requestSleep(token, adapter) {
             } else {
                 adapter.log.error('Cannot read sleep records: ' + (body || error || response.statusCode));
                 reject('Cannot read sleep records: ' + (body || error || response.statusCode));
+            }
+        });
+    });
+}
+
+function requestFood(token, adapter) {
+    const url = `${BASE_URL}-/foods/log/date/${getDate()}.json`;
+    //https://api.fitbit.com/1/user/-/foods/log/date/2020-02-25.json
+    const headers = { Authorization: 'Bearer ' + token };
+
+    return new Promise((resolve, reject) => {
+        request({ url, headers }, (error, response, body) => {
+            adapter.log.info('Retrieving food data');
+            if (!error && response.statusCode === 200) {
+                const data = JSON.parse(body);
+
+                const dataFood = data.summary;
+                //const date = new Date(dataFood.endTime);
+
+                createObject(token, adapter, 'food.CaloriesGoals', { unit: ' ' })
+                    .then(() => {
+                        adapter.setState('food.CaloriesGoals', { val: data.goals.calories, ack: true });
+                        adapter.log.info("Food CaloriesGoals: " + data.goals.calories.toString());
+                    });
+               
+                createObject(token, adapter, 'food.Calories', { unit: ' ' })
+                    .then(() => {
+                        adapter.setState('food.Calories', { val: dataFood.calories, ack: true });
+                        adapter.log.info("Food Calories: " + dataFood.calories.toString());
+                    });
+                createObject(token, adapter, 'food.Carbs', { unit: ' ' })
+                    .then(() => {
+                        adapter.setState('food.Carbs', { val: dataFood.carbs, ack: true });
+                        adapter.log.info("food.Carbs: " + dataFood.carbs.toString());
+                    });
+                createObject(token, adapter, 'food.Fat', { unit: ' ' })
+                    .then(() => {
+                        adapter.setState('food.Fat', { val: dataFood.fat, ack: true });
+                        adapter.log.info("food.fat: " + dataFood.fat.toString());
+                    });
+                createObject(token, adapter, 'food.Fiber', { unit: ' ' })
+                    .then(() => {
+                        adapter.setState('food.Fiber', { val: dataFood.fiber, ack: true });
+                        adapter.log.info("food.fiber: " + dataFood.fiber.toString());
+                    });
+                createObject(token, adapter, 'food.Protein', { unit: ' ' })
+                    .then(() => {
+                        adapter.setState('food.Protein', { val: dataFood.protein, ack: true });
+                        adapter.log.info("food.protein: " + dataFood.protein.toString());
+                    });
+                createObject(token, adapter, 'food.Sodium', { unit: ' ' })
+                    .then(() => {
+                        adapter.setState('food.Sodium', { val: dataFood.sodium, ack: true });
+                        adapter.log.info("food.Sodium: " + dataFood.sodium.toString());
+                    });
+                createObject(token, adapter, 'food.Water', { unit: 'ml' })
+                    .then(() => {
+                        adapter.setState('food.Water', { val: dataFood.water, ack: true });
+                        adapter.log.info("food.Water: " + dataFood.water.toString());
+                    });
+                    
+                resolve();
+            } else {
+                adapter.log.error('Cannot read foods records: ' + (body || error || response.statusCode));
+                reject('Cannot read foods records: ' + (body || error || response.statusCode));
             }
         });
     });
@@ -536,6 +601,7 @@ function main(adapter) {
             adapter.config.fat && promises.push(requestBodyFat(token, adapter));
             adapter.config.activities && promises.push(requestActivities(token, adapter));
             adapter.config.sleep && promises.push(requestSleep(token, adapter));
+            adapter.config.sleep && promises.push(requestFood(token, adapter));
             adapter.config.devices && promises.push(requestDevices(token, adapter));
 
             !promises.length && adapter.log.error('No one option is enabled. Please enable what kind of data do you want to have in adapter configuration!');

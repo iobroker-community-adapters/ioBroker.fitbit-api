@@ -141,7 +141,7 @@ function requestWeight(token, adapter) {
 
                             adapter.getState('weight', (err, state) => {
                                 if (!state ||
-                                    !state.val || 
+                                    !state.val ||
                                     Math.abs(state.ts - date.getTime()) > 1000 || // one second difference
                                     Math.abs(state.val - value.weight) > 0.1) { // 0.1 difference
                                     adapter.setState('weight', { val: value.weight, ack: true, ts: date.getTime() }, () =>
@@ -226,20 +226,11 @@ function requestBodyFat(token, adapter) {
                         if (data && data.fat && data.fat.length) {
                             const value = data.fat.pop();
                             const date = new Date(`${value.date}T${value.time}`);
-                            adapter.getState('fat', (err, state) => {
-                                if (!state ||
-                                    !state.val ||
-                                    Math.abs(state.ts - date.getTime()) > 1000 || // one second difference
-                                    Math.abs(state.val - value.fat) > 0.1) { // 0.1 difference
-                                    adapter.setState('fat', { val: value.fat, ack: true, ts: date.getTime() }, () =>
-                                        resolve());
-                                } else {
-                                    resolve();
-                                }
-                            });
+                            // Do not need to check the change of the data. if monitored this can be set by tracking only new values or deltas
+                            adapter.setState('fat', { val: value.fat, ack: true, ts: date.getTime() }, () => resolve());
                         } else {
-                            adapter.log.warn('Fat record for today is not found');
-                            resolve(); 
+                            adapter.log.warn('Fat record for today is not recorded');
+                            resolve();
                             //reject('fat is not found');
                         }
                     });
@@ -357,39 +348,39 @@ function requestSleep(token, adapter) {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 const dataMainSleep = data.sleep.find(el => el.isMainSleep);
+                const date = new Date(dataMainSleep.endTime);
+                
+                adapter.log.info('Sleep Date: ' + date.getTime().toString());
 
-                //adapter.log.info('NNN Profile: ' + JSON.stringify(data));
- 
                 createObject(token, adapter, 'sleep.MinutesAsleep', { unit: 'minutes' })
                     .then(() => {
-                        const minutesAsleep = dataMainSleep.minutesAsleep;
-                        adapter.setState('sleep.MinutesAsleep', minutesAsleep, true);
-                        adapter.log.info("asleep: " + minutesAsleep.toString());
+                        const minutesAsleep = dataMainSleep.minutesAsleep;                      
+                        adapter.setState('sleep.MinutesAsleep', { val: minutesAsleep, ack: true, ts: date.getTime() });
+                        adapter.log.info("MinutesAsleep: " + minutesAsleep.toString());
                     });
                 createObject(token, adapter, 'sleep.Deep', { unit: 'minutes' })
                     .then(() => {
                         const sleepDeep = dataMainSleep.levels.summary.deep.minutes;
-                        adapter.setState('sleep.Deep', sleepDeep, true);
+                        adapter.setState('sleep.Deep', { val: sleepDeep, ack: true, ts: date.getTime() });
                         adapter.log.info("deep: " + sleepDeep.toString());
                     });
                 createObject(token, adapter, 'sleep.Light', { unit: 'minutes' })
                     .then(() => {
                         const sleepLight = dataMainSleep.levels.summary.light.minutes;
-                        adapter.setState('sleep.Light', sleepLight, true);
+                        adapter.setState('sleep.Light', { val: sleepLight, ack: true, ts: date.getTime() });
                         adapter.log.info("light: " + sleepLight.toString());
                     });
                 createObject(token, adapter, 'sleep.Rem', { unit: 'minutes' })
                     .then(() => {
                         const sleepRem = dataMainSleep.levels.summary.rem.minutes;
-                        adapter.setState('sleep.Rem', sleepRem, true);
+                        adapter.setState('sleep.Rem', { val: sleepRem, ack: true, ts: date.getTime() });
                         adapter.log.info("rem: " + sleepRem.toString());
                     });
-
-                createObject(token, adapter, 'sleepEfficiency', )
+                createObject(token, adapter, 'sleep.Efficiency', { unit: '%' })
                     .then(() => {
                         const sleepEfficiency = dataMainSleep.efficiency;
-                        adapter.log.info('sleepEfficiency: ' + data.sleep[0].efficiency);
-                        adapter.setState('sleepEfficiency', sleepEfficiency, true);
+                        adapter.setState('sleep.Efficiency', sleepEfficiency, true);
+                        adapter.log.info('sleepEfficiency: ' + sleepEfficiency);
                     });
 
                 resolve();

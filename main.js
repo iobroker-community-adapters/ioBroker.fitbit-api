@@ -412,10 +412,10 @@ function requestFood(token, adapter) {
                         adapter.log.info("Food CaloriesGoals: " + data.goals.calories.toString());
                     });
                
-                createObject(token, adapter, 'food.Calories', { unit: ' ' })
+                createObject(token, adapter, 'food.CaloriesConsumed', { unit: ' ' })
                     .then(() => {
-                        adapter.setState('food.Calories', { val: dataFood.calories, ack: true });
-                        adapter.log.info("Food Calories: " + dataFood.calories.toString());
+                        adapter.setState('food.CaloriesConsumed', { val: dataFood.calories, ack: true });
+                        adapter.log.info("Food CaloriesConsumed: " + dataFood.calories.toString());
                     });
                 createObject(token, adapter, 'food.Carbs', { unit: ' ' })
                     .then(() => {

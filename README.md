@@ -2,7 +2,9 @@
 # ioBroker.fitbit
 
 This adapter pulls Data from fitbit API!
-Test
+- heart rate, bmi, weight, steps
+- sleep
+- food
 
 ## Configuration
 ![step1](img/step1.png)

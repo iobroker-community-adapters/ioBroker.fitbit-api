@@ -30,7 +30,7 @@
             "zh-cn": "该适配器从fitbit API中提取数据"
         },
         "authors": [
-            "bluefox <dogafox@gmail.com>"
+            "bluefox <dogafox@gmail.com>","Chris.1965 <besterquester@live.at>"
         ],
         "platform": "Javascript/Node.js",
         "mode": "schedule",

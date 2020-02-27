@@ -2,7 +2,9 @@
 # ioBroker.fitbit
 
 This adapter pulls Data from fitbit API!
-Test
+- heart rate, bmi, weight, steps
+- sleep
+- food
 
 ## Configuration
 ![step1](img/step1.png)
@@ -31,6 +33,8 @@ The API was implemented according to https://dev.fitbit.com/build/reference/web-
 
 ## Changelog
 
+### 0.1.3 (2020-02-26)
+* (chris.1965) added food records 
 ### 0.1.2 (2020-02-21)
 * (chris.1965) added sleep records 
 ### 0.1.1 (2019-11-06)

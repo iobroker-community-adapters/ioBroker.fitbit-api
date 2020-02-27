@@ -601,7 +601,7 @@ function main(adapter) {
             adapter.config.fat && promises.push(requestBodyFat(token, adapter));
             adapter.config.activities && promises.push(requestActivities(token, adapter));
             adapter.config.sleep && promises.push(requestSleep(token, adapter));
-            adapter.config.sleep && promises.push(requestFood(token, adapter));
+            adapter.config.food && promises.push(requestFood(token, adapter));
             adapter.config.devices && promises.push(requestDevices(token, adapter));
 
             !promises.length && adapter.log.error('No one option is enabled. Please enable what kind of data do you want to have in adapter configuration!');

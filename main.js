@@ -152,7 +152,7 @@ function requestWeight(token, adapter) {
                                 }
                             });
                         } else {
-                            adapter.log.warn('Weight record for today is not found');
+                            adapter.log.warn('Weight record for today is not available');
                             resolve();
                             //reject('Weight is not found');
                         }
@@ -229,7 +229,7 @@ function requestBodyFat(token, adapter) {
                             // Do not need to check the change of the data. if monitored this can be set by tracking only new values or deltas
                             adapter.setState('fat', { val: value.fat, ack: true, ts: date.getTime() }, () => resolve());
                         } else {
-                            adapter.log.warn('Fat record for today is not recorded');
+                            adapter.log.warn('Fat record for today is not available');
                             resolve();
                             //reject('fat is not found');
                         }
@@ -345,48 +345,52 @@ function requestSleep(token, adapter) {
     return new Promise((resolve, reject) => {
         request({ url, headers }, (error, response, body) => {
             adapter.log.info('Retrieving sleep data');
+
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
-                const dataMainSleep = data.sleep.find(el => el.isMainSleep);
-                const date = new Date(dataMainSleep.endTime);
+                if (data.sleep) {
+                    const dataMainSleep = data.sleep.find(el => el.isMainSleep);
+                    const date = new Date(dataMainSleep.endTime);
 
-                adapter.log.info('Sleep Date: ' + date.getTime().toString());
+                    createObject(token, adapter, 'sleep.MinutesAsleep', { unit: 'minutes' })
+                        .then(() => {
+                            const minutesAsleep = dataMainSleep.minutesAsleep;
+                            adapter.setState('sleep.MinutesAsleep', { val: minutesAsleep, ack: true, ts: date.getTime() });
+                            adapter.log.info("MinutesAsleep: " + minutesAsleep.toString());
+                        });
+                    createObject(token, adapter, 'sleep.Deep', { unit: 'minutes' })
+                        .then(() => {
+                            const sleepDeep = dataMainSleep.levels.summary.deep.minutes;
+                            adapter.setState('sleep.Deep', { val: sleepDeep, ack: true, ts: date.getTime() });
+                            adapter.log.info("deep: " + sleepDeep.toString());
+                        });
+                    createObject(token, adapter, 'sleep.Light', { unit: 'minutes' })
+                        .then(() => {
+                            const sleepLight = dataMainSleep.levels.summary.light.minutes;
+                            adapter.setState('sleep.Light', { val: sleepLight, ack: true, ts: date.getTime() });
+                            adapter.log.info("light: " + sleepLight.toString());
+                        });
+                    createObject(token, adapter, 'sleep.Rem', { unit: 'minutes' })
+                        .then(() => {
+                            const sleepRem = dataMainSleep.levels.summary.rem.minutes;
+                            adapter.setState('sleep.Rem', { val: sleepRem, ack: true, ts: date.getTime() });
+                            adapter.log.info("rem: " + sleepRem.toString());
+                        });
+                    createObject(token, adapter, 'sleep.Efficiency', { unit: '%' })
+                        .then(() => {
+                            const sleepEfficiency = dataMainSleep.efficiency;
+                            adapter.setState('sleep.Efficiency', sleepEfficiency, true);
+                            adapter.log.info('sleepEfficiency: ' + sleepEfficiency);
+                        });
 
-                createObject(token, adapter, 'sleep.MinutesAsleep', { unit: 'minutes' })
-                    .then(() => {
-                        const minutesAsleep = dataMainSleep.minutesAsleep;
-                        adapter.setState('sleep.MinutesAsleep', { val: minutesAsleep, ack: true, ts: date.getTime() });
-                        adapter.log.info("MinutesAsleep: " + minutesAsleep.toString());
-                    });
-                createObject(token, adapter, 'sleep.Deep', { unit: 'minutes' })
-                    .then(() => {
-                        const sleepDeep = dataMainSleep.levels.summary.deep.minutes;
-                        adapter.setState('sleep.Deep', { val: sleepDeep, ack: true, ts: date.getTime() });
-                        adapter.log.info("deep: " + sleepDeep.toString());
-                    });
-                createObject(token, adapter, 'sleep.Light', { unit: 'minutes' })
-                    .then(() => {
-                        const sleepLight = dataMainSleep.levels.summary.light.minutes;
-                        adapter.setState('sleep.Light', { val: sleepLight, ack: true, ts: date.getTime() });
-                        adapter.log.info("light: " + sleepLight.toString());
-                    });
-                createObject(token, adapter, 'sleep.Rem', { unit: 'minutes' })
-                    .then(() => {
-                        const sleepRem = dataMainSleep.levels.summary.rem.minutes;
-                        adapter.setState('sleep.Rem', { val: sleepRem, ack: true, ts: date.getTime() });
-                        adapter.log.info("rem: " + sleepRem.toString());
-                    });
-                createObject(token, adapter, 'sleep.Efficiency', { unit: '%' })
-                    .then(() => {
-                        const sleepEfficiency = dataMainSleep.efficiency;
-                        adapter.setState('sleep.Efficiency', sleepEfficiency, true);
-                        adapter.log.info('sleepEfficiency: ' + sleepEfficiency);
-                    });
-
-                resolve();
+                    resolve();
+                } else {
+                    adapter.log.warn('No Sleep records available');
+                    resolve();
+                }
             } else {
-                adapter.log.error('Cannot read sleep records: ' + (body || error || response.statusCode));
-                reject('Cannot read sleep records: ' + (body || error || response.statusCode));
+                adapter.log.warn('Error : ' + (body || error || response.statusCode));
+                resolve();
             }
         });
     });
@@ -411,7 +415,7 @@ function requestFood(token, adapter) {
                         adapter.setState('food.CaloriesGoals', { val: data.goals.calories, ack: true });
                         adapter.log.info("Food CaloriesGoals: " + data.goals.calories.toString());
                     });
-               
+
                 createObject(token, adapter, 'food.CaloriesConsumed', { unit: ' ' })
                     .then(() => {
                         adapter.setState('food.CaloriesConsumed', { val: dataFood.calories, ack: true });
@@ -447,10 +451,10 @@ function requestFood(token, adapter) {
                         adapter.setState('food.Water', { val: dataFood.water, ack: true });
                         adapter.log.info("food.Water: " + dataFood.water.toString());
                     });
-                    
+
                 resolve();
             } else {
-                adapter.log.error('Cannot read foods records: ' + (body || error || response.statusCode));
+                adapter.log.error('Cannot read foods records available' + (body || error || response.statusCode));
                 reject('Cannot read foods records: ' + (body || error || response.statusCode));
             }
         });

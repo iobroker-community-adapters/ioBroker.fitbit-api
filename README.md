@@ -1,6 +1,8 @@
 ![Logo](admin/fitbit-api.png)
 # ioBroker.fitbit
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/iobroker-community-adapters/ioBroker.fitbit-api.svg)](https://greenkeeper.io/)
+
 This adapter pulls Data from fitbit API!
 
 ## Configuration

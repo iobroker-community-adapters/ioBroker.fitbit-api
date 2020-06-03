@@ -246,6 +246,163 @@ function requestBodyFat(token, adapter) {
     });
 }
 
+function requestSleep(token, adapter) {
+    const url = `${BASE_URL}-/sleep/date/${getDate()}.json`;
+    const headers = {Authorization: 'Bearer ' + token};
+
+    return new Promise((resolve, reject) => {
+        // read more here: https://dev.fitbit.com/build/reference/web-api/body/
+
+        // const response =
+        //
+        // {
+        //     "sleep": [
+        //         {
+        //             "dateOfSleep": "2017-04-02",
+        //             "duration": <value in milliseconds>,
+        //             "efficiency": <value>,
+        //             "isMainSleep": true,
+        //             "levels": {
+        //                 "summary": {
+        //                     "deep": {
+        //                         "count": <value>,
+        //                         "minutes": <value>,
+        //                         "thirtyDayAvgMinutes": <value>
+        //                     },
+        //                     "light": {
+        //                         "count": <value>,
+        //                         "minutes": <value>,
+        //                         "thirtyDayAvgMinutes": <value>
+        //                     },
+        //                     "rem": {
+        //                         "count": <value>,
+        //                         "minutes": <value>,
+        //                         "thirtyDayAvgMinutes": <value>
+        //                     },
+        //                     "wake": {
+        //                         "count": <value>,
+        //                         "minutes": <value>,
+        //                         "thirtyDayAvgMinutes": <value>
+        //                     }
+        //                 },
+        //                 "data": [
+        //                     {
+        //                         "datetime": "2017-04-01T23:58:30.000",
+        //                         "level": "wake",
+        //                         "seconds": <value>
+        //                     },
+        //                     {
+        //                         "datetime": "2017-04-02T00:16:30.000",
+        //                         "level": "rem",
+        //                         "seconds": <value>
+        //                     },
+        //                     <...>
+        //                 ],
+        //                 "shortData": [
+        //                     {
+        //                         "datetime": "2017-04-02T05:58:30.000",
+        //                         "level": "wake",
+        //                         "seconds": <value>
+        //                     },
+        //                     <...>
+        //                 ]
+        //             },
+        //             "logId": <value>,
+        //             "minutesAfterWakeup": <value>,
+        //             "minutesAsleep": <value>,
+        //             "minutesAwake": <value>,
+        //             "minutesToFallAsleep": <value>, // this is generally 0 for autosleep created sleep logs
+        //             "startTime": "2017-04-01T23:58:30.000",
+        //             "timeInBed": <value in minutes>,
+        //             "type": "stages"
+        //         },
+        //         {
+        //             "dateOfSleep": "2017-04-02",
+        //             "duration": <value in milliseconds>,
+        //             "efficiency": <value>,
+        //             "isMainSleep": false,
+        //             "levels": {
+        //                 "data": [
+        //                     {
+        //                         "dateTime": "2017-04-02T12:06:00.000",
+        //                         "level": "asleep",
+        //                         "seconds": <value>
+        //                     },
+        //                     {
+        //                         "dateTime": "2017-04-02T12:13:00.000",
+        //                         "level": "restless",
+        //                         "seconds": <value>
+        //                     },
+        //                     {
+        //                         "dateTime": "2017-04-02T12:14:00.000",
+        //                         "level": "awake",
+        //                         "seconds": <value>
+        //                     },
+        //                     <...>
+        //                 ],
+        //                 "summary": {
+        //                     "asleep": {
+        //                         "count": 0, // this field should not be used for "asleep" summary info
+        //                         "minutes": <value>
+        //                     },
+        //                     "awake": {
+        //                         "count": <value>,
+        //                         "minutes": <value>
+        //                     },
+        //                     "restless": {
+        //                         "count": <value>,
+        //                         "minutes": <value>
+        //                     }
+        //                 }
+        //             },
+        //             "logId": <value>,
+        //             "minutesAfterWakeup": <value>,
+        //             "minutesAsleep": <value>,
+        //             "minutesAwake": <value>,
+        //             "minutesToFallAsleep": <value>, // this is generally 0 for autosleep created sleep logs
+        //             "startTime": "2017-04-02T12:06:00.000",
+        //             "timeInBed": <value in minutes>,
+        //             "type": "classic"
+        //         }
+        //     ],
+        //     "summary": {
+        //         "totalMinutesAsleep": <value>,
+        //         "totalSleepRecords": 2,
+        //         "totalTimeInBed": <value in minutes>
+        //     }
+        // };
+        request({url, headers}, (error, response, body) => {
+            if (!error && response.statusCode === 200) {
+                const data = JSON.parse(body);
+                adapter.log.debug('Sleep: ' + JSON.stringify(data ? data.summary : data));
+
+                createObject(token, adapter, 'sleep', {role: 'value.health.sleep', unit: 'min'})
+                    .then(() => {
+                        if (data && data.summary && data.summary.totalMinutesAsleep !== undefined) {
+                            const value = data.summary.totalMinutesAsleep;
+                            adapter.getState('sleep', (err, state) => {
+                                if (!state ||
+                                    !state.val ||
+                                    Math.abs(state.val - value) > 0.1) { // 0.1 difference
+                                    adapter.setState('sleep', {val: value, ack: true}, () =>
+                                        resolve());
+                                } else {
+                                    resolve();
+                                }
+                            });
+                        } else {
+                            reject('sleep is not found');
+                        }
+                    });
+            } else {
+                adapter.log.error('Cannot read sleep: ' + (body || error || response.statusCode));
+                reject('Cannot read sleep: ' + (body || error || response.statusCode));
+            }
+        });
+    });
+}
+
+
 function requestActivities(token, adapter) {
     const url = `${BASE_URL}-/activities/date/${getDate()}.json`;
     const headers = {Authorization: 'Bearer ' + token};
@@ -485,6 +642,7 @@ function main(adapter) {
             adapter.config.fat        && promises.push(requestBodyFat(token, adapter));
             adapter.config.activities && promises.push(requestActivities(token, adapter));
             adapter.config.devices    && promises.push(requestDevices(token, adapter));
+            adapter.config.sleep      && promises.push(requestSleep(token, adapter));
 
             !promises.length && adapter.log.error('No one option is enabled. Please enable what kind of data do you want to have in adapter configuration!');
 

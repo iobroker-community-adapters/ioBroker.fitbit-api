@@ -461,7 +461,7 @@ function requestActivities(token, adapter) {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.debug('Profile: ' + JSON.stringify(data));
-                createObject(token, adapter, 'steps', {unit: 'steps'})
+                createObject(token, adapter, 'steps', {unit: 'steps', role: 'value.health.steps'})
                     .then(() => createObject(token, adapter, 'restingHeartRate', {
                         desc: {
                             "en": "The number of heart beats per minute while you are at rest",
@@ -475,9 +475,10 @@ function requestActivities(token, adapter) {
                             "pl": "Liczba uderzeń serca na minutę podczas odpoczynku",
                             "zh-cn": "休息时每分钟的心跳次数"
                         },
+                        role: 'value.health.bpm',
                         unit: 'bpm'
                     }))
-                    .then(() => createObject(token, adapter, 'calories', {unit: 'kcal'}))
+                    .then(() => createObject(token, adapter, 'calories', {unit: 'kcal', role: 'value.health.calories'}))
                     .then(() => {
                         if (data && data.summary) {
                             const summary = data.summary;

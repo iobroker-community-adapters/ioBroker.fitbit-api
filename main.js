@@ -348,7 +348,7 @@ function requestSleep(token, adapter) {
 
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
-                if (data.sleep) {
+                if (data.sleep.endTime) {
                     const dataMainSleep = data.sleep.find(el => el.isMainSleep);
                     const date = new Date(dataMainSleep.endTime);
 

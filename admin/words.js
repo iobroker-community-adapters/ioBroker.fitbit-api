@@ -27,5 +27,17 @@ systemDictionary = {
         "es": "Token de actualización",
         "pl": "Zaktualizuj token",
         "zh-cn": "更新令牌"
+    },
+    "Sleep": {
+        "en": "Sleep",
+        "de": "Schlaf",
+        "ru": "Спать",
+        "pt": "Dormir",
+        "nl": "Slaap",
+        "fr": "Dormir",
+        "it": "Dormire",
+        "es": "Dormir",
+        "pl": "Sen",
+        "zh-cn": "睡觉"
     }
 };

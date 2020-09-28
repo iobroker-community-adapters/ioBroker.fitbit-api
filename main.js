@@ -348,7 +348,7 @@ function requestSleep(token, adapter) {
 
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
-                
+
                 if (data.sleep.length > 0) {
                     const dataMainSleep = data.sleep.find(el => el.isMainSleep);
                     const date = new Date(dataMainSleep.endTime);
@@ -376,6 +376,12 @@ function requestSleep(token, adapter) {
                             const sleepRem = dataMainSleep.levels.summary.rem.minutes;
                             adapter.setState('sleep.Rem', { val: sleepRem, ack: true, ts: date.getTime() });
                             adapter.log.info("rem: " + sleepRem.toString());
+                        });
+                    createObject(token, adapter, 'sleep.Wake', { unit: 'minutes' })
+                        .then(() => {
+                            const sleepWake = dataMainSleep.levels.summary.wake.minutes;
+                            adapter.setState('sleep.Wake', { val: sleepWake, ack: true, ts: date.getTime() });
+                            adapter.log.info("wake: " + sleepWake.toString());
                         });
                     createObject(token, adapter, 'sleep.Efficiency', { unit: '%' })
                         .then(() => {

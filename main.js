@@ -350,7 +350,7 @@ function requestSleep(token, adapter) {
                 const data = JSON.parse(body);
                 adapter.log.info("data: " + data.sleep.dateOfSleep);
                 
-                if (data.sleep.dateOfSleep) {
+                if (data.sleep.length > 0) {
                     const dataMainSleep = data.sleep.find(el => el.isMainSleep);
                     const date = new Date(dataMainSleep.endTime);
 

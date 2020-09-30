@@ -322,8 +322,12 @@ function requestActivities(token, adapter) {
                             const summary = data.summary;
 
                             adapter.setState('steps', summary.steps, true);
+                            adapter.log.info(`...steps:${summary.steps}`);
+
                             summary.restingHeartRate && adapter.setState('restingHeartRate', summary.restingHeartRate, true);
                             adapter.setState('calories', summary.caloriesOut, true);
+                            adapter.log.info(`...calories:${summary.caloriesOut}`);
+
                             resolve();
                         } else {
                             reject('Activities not found');
@@ -357,37 +361,37 @@ function requestSleep(token, adapter) {
                         .then(() => {
                             const minutesAsleep = dataMainSleep.minutesAsleep;
                             adapter.setState('sleep.MinutesAsleep', { val: minutesAsleep, ack: true, ts: date.getTime() });
-                            adapter.log.info("MinutesAsleep: " + minutesAsleep.toString());
+                            adapter.log.info("...MinutesAsleep: " + minutesAsleep.toString());
                         });
                     createObject(token, adapter, 'sleep.Deep', { unit: 'minutes' })
                         .then(() => {
                             const sleepDeep = dataMainSleep.levels.summary.deep.minutes;
                             adapter.setState('sleep.Deep', { val: sleepDeep, ack: true, ts: date.getTime() });
-                            adapter.log.info("deep: " + sleepDeep.toString());
+                            adapter.log.info("...deep: " + sleepDeep.toString());
                         });
                     createObject(token, adapter, 'sleep.Light', { unit: 'minutes' })
                         .then(() => {
                             const sleepLight = dataMainSleep.levels.summary.light.minutes;
                             adapter.setState('sleep.Light', { val: sleepLight, ack: true, ts: date.getTime() });
-                            adapter.log.info("light: " + sleepLight.toString());
+                            adapter.log.info("...light: " + sleepLight.toString());
                         });
                     createObject(token, adapter, 'sleep.Rem', { unit: 'minutes' })
                         .then(() => {
                             const sleepRem = dataMainSleep.levels.summary.rem.minutes;
                             adapter.setState('sleep.Rem', { val: sleepRem, ack: true, ts: date.getTime() });
-                            adapter.log.info("rem: " + sleepRem.toString());
+                            adapter.log.info("...rem: " + sleepRem.toString());
                         });
                     createObject(token, adapter, 'sleep.Wake', { unit: 'minutes' })
                         .then(() => {
                             const sleepWake = dataMainSleep.levels.summary.wake.minutes;
                             adapter.setState('sleep.Wake', { val: sleepWake, ack: true, ts: date.getTime() });
-                            adapter.log.info("wake: " + sleepWake.toString());
+                            adapter.log.info("...wake: " + sleepWake.toString());
                         });
                     createObject(token, adapter, 'sleep.Efficiency', { unit: '%' })
                         .then(() => {
                             const sleepEfficiency = dataMainSleep.efficiency;
                             adapter.setState('sleep.Efficiency', sleepEfficiency, true);
-                            adapter.log.info('sleepEfficiency: ' + sleepEfficiency);
+                            adapter.log.info('...sleepEfficiency: ' + sleepEfficiency);
                         });
 
                     resolve();

@@ -337,8 +337,9 @@ function requestActivities(token, adapter) {
                         }
                     });
             } else {
-                adapter.log.error('Cannot read activities: ' + (body || error || response.statusCode));
-                reject('Cannot read activities: ' + (body || error || response.statusCode));
+                adapter.log.warn('Cannot read activities: ' + (body || error || response.statusCode));
+                resolve();
+                //reject('Cannot read activities: ' + (body || error || response.statusCode));
             }
         });
     });

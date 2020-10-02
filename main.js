@@ -158,8 +158,10 @@ function requestWeight(token, adapter) {
                         }
                     });
             } else {
-                adapter.log.error('Cannot read weight: ' + (body || error || response.statusCode));
-                reject('Cannot read weight: ' + (body || error || response.statusCode));
+                adapter.log.warn('Cannot read weight records: ');
+                resolve();
+                //reject('Cannot read weight: ' + (body || error || response.statusCode));
+                //reject('Cannot read weight: ' + (body || error || response.statusCode));
             }
         });
     });
@@ -235,8 +237,9 @@ function requestBodyFat(token, adapter) {
                         }
                     });
             } else {
-                adapter.log.error('Cannot read fat: ' + (body || error || response.statusCode));
-                reject('Cannot read fat: ' + (body || error || response.statusCode));
+                adapter.log.warn('Cannot read fat: ' + (body || error || response.statusCode));
+                resolve();
+                //reject('Cannot read fat: ' + (body || error || response.statusCode));
             }
         });
     });
@@ -465,8 +468,9 @@ function requestFood(token, adapter) {
 
                 resolve();
             } else {
-                adapter.log.error('Cannot read foods records available' + (body || error || response.statusCode));
-                reject('Cannot read foods records: ' + (body || error || response.statusCode));
+                adapter.log.warn('Cannot read foods records available' + (body || error || response.statusCode));
+                resolve();
+                //reject('Cannot read foods records: ' + (body || error || response.statusCode));
             }
         });
     });
@@ -547,8 +551,9 @@ function requestDevices(token, adapter) {
                     .then(() => resolve())
                     .catch(e => reject(e));
             } else {
-                adapter.log.error('Cannot read devices: ' + (body || error || response.statusCode));
-                reject('Cannot read devices: ' + (body || error || response.statusCode));
+                adapter.log.warn('Cannot read devices:');
+                resolve();
+                //reject('Cannot read devices: ' + (body || error || response.statusCode));
             }
         });
     });

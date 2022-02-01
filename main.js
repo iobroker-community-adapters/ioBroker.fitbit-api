@@ -101,7 +101,8 @@ function requestProfile(token, adapter) {
 }
 
 function requestWeight(token, adapter) {
-    const url = `${BASE_URL}-/body/log/weight/date/${getDate()}.json`;
+    // https://api.fitbit.com/1/user/-/body/weight/date/2022-02-01/1d.json
+    const url = `${BASE_URL}-/body/log/weight/date/${getDate()}/1d.json`;
     const headers = { Authorization: 'Bearer ' + token };
 
     return new Promise((resolve, reject) => {
@@ -422,8 +423,7 @@ function requestFood(token, adapter) {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
 
-                const dataFood = data.summary;
-                //const date = new Date(dataFood.endTime);
+                const dataFood = data.summary;              
 
                 createObject(token, adapter, 'food.CaloriesGoals', { unit: ' ' })
                     .then(() => {

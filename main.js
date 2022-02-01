@@ -101,33 +101,16 @@ function requestProfile(token, adapter) {
 }
 
 function requestWeight(token, adapter) {
-    // https://api.fitbit.com/1/user/-/body/weight/date/2022-02-01/1d.json
-    const url = `${BASE_URL}-/body/log/weight/date/${getDate()}/1d.json`;
+    // can read weight,fat and bmi change this
+    // Use swagger to test api 
+    // https://dev.fitbit.com/build/reference/web-api/explore/#/Body%20and%20Weight/getBodyFatByDate
+    
+    // https://api.fitbit.com/1/user/-/body/log/weight/date/2022-02-01.json
+    const url = `${BASE_URL}-/body/log/weight/date/${getDate()}.json`;
     const headers = { Authorization: 'Bearer ' + token };
 
     return new Promise((resolve, reject) => {
-        // read more here: https://dev.fitbit.com/build/reference/web-api/body/
-
-        // const response = {
-        //     "weight":[
-        //         {
-        //             "bmi":23.57,
-        //             "date":"2015-03-05",
-        //             "logId":1330991999000,
-        //             "time":"23:59:59",
-        //             "weight":73,
-        //             "source": "API"
-        //         },
-        //         {
-        //             "bmi":22.57,
-        //             "date":"2015-03-05",
-        //             "logId":1330991999000,
-        //             "time":"21:10:59",
-        //             "weight":72.5,
-        //             "source": "Aria"
-        //         }
-        //     ]
-        // };
+       
         request({ url, headers }, (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
@@ -195,31 +178,15 @@ function createObject(token, adapter, name, common) {
 }
 
 function requestBodyFat(token, adapter) {
+    // https://api.fitbit.com/1/user/-/body/log/fat/date/2022-02-01.json
+
     const url = `${BASE_URL}-/body/log/fat/date/${getDate()}.json`;
     const headers = { Authorization: 'Bearer ' + token };
 
     return new Promise((resolve, reject) => {
-        // read more here: https://dev.fitbit.com/build/reference/web-api/body/
-
-        // const response = {
-        //     "fat":[
-        //         {
-        //             "date":"2012-03-05",
-        //             "fat":14,
-        //             "logId":1330991999000,
-        //             "time":"23:59:59",
-        //             "source": "API"
-        //         },
-        //         {
-        //             "date":"2012-03-05",
-        //             "fat":13.5,
-        //             "logId":1330991999000,
-        //             "time":"21:20:59",
-        //             "source":"Aria"
-        //         }
-        //     ]
-        // };
+        
         request({ url, headers }, (error, response, body) => {
+            // 
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
                 adapter.log.debug('Fat: ' + JSON.stringify(data));
@@ -423,7 +390,7 @@ function requestFood(token, adapter) {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);
 
-                const dataFood = data.summary;              
+                const dataFood = data.summary;
 
                 createObject(token, adapter, 'food.CaloriesGoals', { unit: ' ' })
                     .then(() => {
@@ -482,31 +449,7 @@ function requestDevices(token, adapter) {
     const headers = { Authorization: 'Bearer ' + token };
 
     return new Promise((resolve, reject) => {
-        // read more here: https://dev.fitbit.com/build/reference/web-api/devices/
-
-        // const response = [
-        //     {
-        //         "battery": "High",
-        //         "deviceVersion": "Charge HR",
-        //         "id": "27072629",
-        //         "lastSyncTime": "2015-07-27T17:01:39.313",
-        //         "type": "TRACKER"
-        //     },
-        //     {
-        //         "battery": "Empty",
-        //         "deviceVersion": "MobileTrack",
-        //         "id": "29559794",
-        //         "lastSyncTime": "2015-07-19T16:57:59.000",
-        //         "type": "TRACKER"
-        //     },
-        //     {
-        //         "battery": "High",
-        //         "deviceVersion": "Aria",
-        //         "id": "Y1PFEJZGGX8QFYTV",
-        //         "lastSyncTime": "2015-07-27T07:14:34.000",
-        //         "type": "SCALE"
-        //     }
-        // ];
+       
         request({ url, headers }, (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 const data = JSON.parse(body);

@@ -13,35 +13,8 @@ systemDictionary = {
     "OAuth Client ID": {                             "en": "OAuth Client ID",                                 "de": "OAuth-Client-ID",                                 "ru": "OAuth client ID",                                 "pt": "ID do cliente OAuth",                             "nl": "OAuth-client-ID",                                 "fr": "ID client OAuth",                                 "it": "ID client OAuth",                                 "es": "OAuth Client ID",                                 "pl": "Identyfikator klienta OAuth",                     "zh-cn": "OAuth Client ID"},
     "Refresh token": {                               "en": "Refresh token",                                   "de": "Refresh Token",                                   "ru": "Refresh token",                                   "pt": "Atualizar token",                                 "nl": "Refresh token",                                   "fr": "Refresh token",                                   "it": "Refresh token",                                   "es": "Refresh token",                                   "pl": "Refresh token",                                   "zh-cn": "Refresh token"},
     "Services": {                                    "en": "Services",                                        "de": "Dienste",                                         "ru": "Сервисы",                                         "pt": "Serviços",                                        "nl": "Diensten",                                        "fr": "Prestations de service",                          "it": "Servizi",                                         "es": "Services",                                        "pl": "Usługi",                                          "zh-cn": "服务"},
+    "Sleep": {                                       "en": "Sleep",                                           "de": "Schlaf",                                          "ru": "Спать",                                           "pt": "Dormir",                                          "nl": "Slaap",                                           "fr": "Dormir",                                          "it": "Dormire",                                         "es": "Dormir",                                          "pl": "Sen",                                             "zh-cn": "睡觉"},
     "Update token": {                                "en": "Update token",                                    "de": "Token aktualisieren",                             "ru": "Обновить токен",                                  "pt": "Atualizar token",                                 "nl": "Update token",                                    "fr": "Jeton de mise à jour",                            "it": "Token di aggiornamento",                          "es": "Token de actualización",                          "pl": "Zaktualizuj token",                               "zh-cn": "更新令牌"},
     "Weight": {                                      "en": "Weight",                                          "de": "Gewicht",                                         "ru": "Вес",                                             "pt": "Peso",                                            "nl": "Gewicht",                                         "fr": "Poids",                                           "it": "Peso",                                            "es": "Weight",                                          "pl": "Waga",                                            "zh-cn": "重量"},
-    "Fat": {                                         "en": "Fat",                                             "de": "Fettindex",                                       "ru": "Индекс жира",                                     "pt": "Gordura",                                         "nl": "Dik",                                             "fr": "Graisse",                                         "it": "Grasso",                                          "es": "Fat",                                             "pl": "Tłuszcz",                                         "zh-cn": "脂肪"},
-    "Activities": {                                  "en": "Activities",                                      "de": "Aktivitäten",                                     "ru": "Мероприятия",                                     "pt": "Atividades",                                      "nl": "Activiteiten",                                    "fr": "Activités",                                       "it": "attività",                                        "es": "Activities",                                      "pl": "Zajęcia",                                         "zh-cn": "活动项目"},
-    "Device battery": {                              "en": "Device battery",                                  "de": "Gerätebatterie",                                  "ru": "Состояние батареи устройств",                     "pt": "Bateria do dispositivo",                          "nl": "Apparaat batterij",                               "fr": "Batterie de l'appareil",                          "it": "Batteria del dispositivo",                        "es": "Device battery",                                  "pl": "Bateria urządzenia",                              "zh-cn": "设备电池"},
-    "Update token": {
-        "en": "Update token",
-        "de": "Token aktualisieren",
-        "ru": "Обновить токен",
-        "pt": "Atualizar token",
-        "nl": "Update token",
-        "fr": "Jeton de mise à jour",
-        "it": "Token di aggiornamento",
-        "es": "Token de actualización",
-        "pl": "Zaktualizuj token",
-        "zh-cn": "更新令牌"
-    },
-    "Sleep": {
-        "en": "Sleep",
-        "de": "Schlaf",
-        "ru": "Спать",
-        "pt": "Dormir",
-        "nl": "Slaap",
-        "fr": "Dormir",
-        "it": "Dormire",
-        "es": "Dormir",
-        "pl": "Sen",
-        "zh-cn": "睡觉"
-    },
     "You can obtain the client ID here: ": {         "en": "You can obtain the client ID here: ",             "de": "Client-ID kann man hier bekommen:",               "ru": "Вы можете получить client ID здесь:",             "pt": "Você pode obter o ID do cliente aqui:",           "nl": "U kunt de klant-ID hier verkrijgen:",             "fr": "Vous pouvez obtenir l'ID client ici:",            "it": "È possibile ottenere l'ID client qui:",           "es": "You can obtain the client ID here: ",             "pl": "Identyfikator klienta można uzyskać tutaj:",      "zh-cn": "您可以在此处获取客户端ID："},
-
 };

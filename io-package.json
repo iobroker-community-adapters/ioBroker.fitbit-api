@@ -16,7 +16,19 @@
                 "zh-cn": "初始发行"
             }
         },
-		"title": "fitbit API",
+        "title": "fitbit API",
+        "titleLang": {
+            "en": "fitbit API",
+            "de": "Fitbit-API",
+            "ru": "фитбит API",
+            "pt": "API fitbit",
+            "nl": "fitbit-API",
+            "fr": "API fitbit",
+            "it": "API fitbit",
+            "es": "API de fitbit",
+            "pl": "Fitbit API",
+            "zh-cn": "Fitbit API"
+        },
         "desc": {
             "en": "This adapter pulls Data from fitbit API",
             "de": "Dieser Adapter zieht Daten aus der Fitbit-API",
@@ -40,11 +52,28 @@
         "compact": true,
         "enabled": true,
         "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.fitbit-api/master/admin/fitbit-api.png",
-        "keywords": ["fitbit", "scale", "weight"],
+        "keywords": [
+            "fitbit",
+            "scale",
+            "weight"
+        ],
         "readme": "https://github.com/iobroker-community-adapters/ioBroker.fitbit-api/blob/master/README.md",
         "loglevel": "info",
         "type": "health",
-        "license": "MIT"
+        "license": "MIT",
+        "connectionType": "cloud",
+        "dataSource": "poll",
+        "tier": 2,
+        "dependencies": [
+            {
+                "js-controller": ">=2.0.0"
+            }
+        ],
+        "plugins": {
+            "sentry": {
+                "dsn": "https://cccf02ca7bf3401a8cd0b0b70697d358@sentry.iobroker.net/179"
+            }
+        }
     },
     "native": {
         "token": "",
@@ -55,7 +84,7 @@
     },
     "instanceObjects": [
         {
-            "_id":  "tokens",
+            "_id": "tokens",
             "type": "channel",
             "common": {
                 "name": "Access tokens"
@@ -63,37 +92,37 @@
             "native": {}
         },
         {
-            "_id":  "tokens.access",
+            "_id": "tokens.access",
             "type": "state",
             "common": {
-                "role":  "state",
-                "name":  "Access token",
-                "type":  "string",
-                "read":  true,
+                "role": "state",
+                "name": "Access token",
+                "type": "string",
+                "read": true,
                 "write": false
             },
             "native": {}
         },
         {
-            "_id":  "tokens.refresh",
+            "_id": "tokens.refresh",
             "type": "state",
             "common": {
-                "role":  "state",
-                "name":  "Refresh token",
-                "type":  "string",
-                "read":  true,
+                "role": "state",
+                "name": "Refresh token",
+                "type": "string",
+                "read": true,
                 "write": false
             },
             "native": {}
         },
         {
-            "_id":  "tokens.expire",
+            "_id": "tokens.expire",
             "type": "state",
             "common": {
-                "role":  "state",
-                "name":  "Expire on",
-                "type":  "string",
-                "read":  true,
+                "role": "state",
+                "name": "Expire on",
+                "type": "string",
+                "read": true,
                 "write": false
             },
             "native": {}

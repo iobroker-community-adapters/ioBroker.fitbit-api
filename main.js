@@ -179,7 +179,7 @@ function createObject(token, adapter, name, common) {
                         obj.common.read = true;
                         obj.common.write = false;
                         obj.native = {};
-                        adapter.setObject(name, obj, () => resolve(user));
+                        adapter.extendObject(name, obj, () => resolve(user));
                     });
             } else {
                 resolve();

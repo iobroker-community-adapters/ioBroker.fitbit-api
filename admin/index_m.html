@@ -92,7 +92,7 @@
                     $('#expireOn').val(time.toISOString());
                     M.updateTextFields();
                 }).fail(function (err) {
-                    window.alert(err);
+                    window.alert(err.message ? err.message : err.toString());
                 });
             }
         }, false);

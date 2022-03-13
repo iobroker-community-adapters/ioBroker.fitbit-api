@@ -16,6 +16,7 @@
 <script type="text/javascript">
     var clientID = '22BD68';
     var clientSecret = 'c4612114c93436901b6affb03a1e5ec8';
+    var authUrl = 'https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=' + clientID + '&redirect_uri=https%3A%2F%2Foauth.iobroker.in%2Ftoken&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=2592000000';
 
     function load(settings, onChange) {
         if (!settings) {
@@ -51,12 +52,11 @@
         });
 
         $('.table-button-do').on('click', function () {
-            var url = 'https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=' + clientID + '&redirect_uri=https%3A%2F%2Foauth.iobroker.in%2Ftoken&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=2592000000';
             var $iframe = $('#iframe');
             $('#iframe_div').show();
             $('.no-iframe').hide();
             $('.tokens').hide();
-            $iframe.attr('src', url).show();
+            $iframe.attr('src', authUrl).show();
             $iframe.css('border', '1px solid red');
         });
 
@@ -84,15 +84,15 @@
                     var time = new Date();
                     time.setSeconds(time.getSeconds() + data.expires_in);
 
-                    socket.emit('setState', 'fitbit-api.' + instance + '.tokens.access', data.access_token, true);
-                    socket.emit('setState', 'fitbit-api.' + instance + '.tokens.refresh', data.refresh_token, true);
-                    socket.emit('setState', 'fitbit-api.' + instance + '.tokens.expire', time.toISOString(), true);
+                    socket.emit('setState', 'fitbit-api.' + instance + '.tokens.access', {val: data.access_token, ack: true});
+                    socket.emit('setState', 'fitbit-api.' + instance + '.tokens.refresh', {val: data.refresh_token, ack: true});
+                    socket.emit('setState', 'fitbit-api.' + instance + '.tokens.expire', {val: time.toISOString(), ack: true});
                     $('#accessToken').val(data.access_token);
                     $('#refreshToken').val(data.refresh_token);
                     $('#expireOn').val(time.toISOString());
                     M.updateTextFields();
                 }).fail(function (err) {
-                    window.alert(err.message ? err.message : err.toString());
+                    window.alert(err.message ? err.message.toString() : err.toString());
                 });
             }
         }, false);
@@ -134,6 +134,8 @@
             }
         });
 
+        var loginText = '<b>Please <a href ="' + authUrl + '" target="_blank">Login using this link</a> before pressing the Authorize Button!</a><br>';
+        $('#loginUrl').html(loginText);
         onChange(false);
         M.updateTextFields();
     }
@@ -183,6 +185,7 @@
                 </div>
             </div>
             <div class="row generate no-iframe">
+                <b><span id="loginUrl" for="loginUrl" class="translate">Please login before klicking Authorize button!</span></b>
                 <a class="waves-effect waves-light btn blue table-button-do"><i class="material-icons">add</i><span class="translate">Authorize</span></a>
             </div>
             <div class="row generate" id="iframe_div">

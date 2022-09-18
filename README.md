@@ -1,4 +1,5 @@
 ![Logo](admin/fitbit-api.png)
+# This adapter is deprecated and replaced by https://github.com/Chris-1965/ioBroker.fitbit-fitness
 # ioBroker.fitbit
 
 ![Number of Installations](http://iobroker.live/badges/fitbit-api-installed.svg)
